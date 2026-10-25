@@ -52,7 +52,7 @@
 
 
 					<form method="post"
-							action="<?php echo $_SERVER['PHP_SELF']?>"
+							action="<?php echo $_SERVER['SCRIPT_NAME']?>"
 							enctype="multipart/form-data"
 					>
 
