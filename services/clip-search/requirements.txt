@@ -1,0 +1,6 @@
+# Tested on x86-64 Linux with Python 3.13 (Debian 13's python3).
+faiss-cpu==1.15.1
+ftfy==6.3.1
+numpy==2.5.3
+onnxruntime==1.29.0
+regex==2026.9.29

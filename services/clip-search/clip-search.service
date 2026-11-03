@@ -1,0 +1,30 @@
+# Install: see "CLIP IMAGE SEARCH" in DEPLOYING.
+[Unit]
+Description=tmbo CLIP image search
+After=network.target
+
+[Service]
+User=thismightbe
+WorkingDirectory=/home/thismightbe/sites/tmbo/services/clip-search
+Environment=CLIP_SEARCH_DATA=/home/thismightbe/clip-search/data
+Environment=CLIP_SEARCH_HOST=127.0.0.1
+Environment=CLIP_SEARCH_PORT=8737
+Environment=CLIP_SEARCH_THREADS=2
+ExecStart=/home/thismightbe/clip-search/venv/bin/python server.py
+Restart=on-failure
+RestartSec=5
+
+# Measured: ~910 MB resident once loaded, ~1.1 GB peak while loading.  If it
+# outgrows this, the kernel kills it and the site keeps running.
+MemoryMax=1500M
+MemorySwapMax=0
+CPUQuota=150%
+Nice=10
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target

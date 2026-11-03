@@ -345,3 +345,57 @@ after you roll forward, for the same reason.
 Do not leave production checked out on a detached commit or a feature branch.  Merge
 first, then move the server back to develop, then delete the branch.  A branch
 deleted out from under a live checkout is its own outage.
+
+
+###############################################################################
+CLIP IMAGE SEARCH
+###############################################################################
+
+services/clip-search/ is a small Python service that turns search text into a
+CLIP vector and returns the upload ids whose images match it best.  It runs
+under systemd, outside PHP, and listens on 127.0.0.1:8737 only.  Nothing else on
+the site depends on it: if it is down, image search fails and every other page
+is unaffected.
+
+It needs four data files, built from the embedding index in the
+tmbo-clip-search repository (its serve/ folder) and kept outside the checkout:
+
+    clip_text.onnx  bpe_simple_vocab_16e6.txt.gz  vectors.f16.npy  ids.u32
+
+About 730 MB on disk.  Check `df -h /` first; the disk was at 91% when this was
+written.  Copy them up from wherever they were built:
+
+    mkdir -p ~/clip-search/data
+    scp serve/{clip_text.onnx,bpe_simple_vocab_16e6.txt.gz,vectors.f16.npy,ids.u32} \
+        thismightbe@<server>:clip-search/data/
+
+Install once.  The venv uses the system python3; the pinned versions are the
+ones it was tested with:
+
+    python3 -m venv ~/clip-search/venv
+    ~/clip-search/venv/bin/pip install -r ~/sites/tmbo/services/clip-search/requirements.txt
+    sudo cp ~/sites/tmbo/services/clip-search/clip-search.service /etc/systemd/system/
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now clip-search
+
+It takes about five seconds to load.  Then:
+
+    curl -s localhost:8737/health
+    curl -s 'localhost:8737/search?q=a+dog+on+a+beach&k=5'
+    journalctl -u clip-search -n 20
+
+Resident memory is about 910 MB once loaded.  The unit caps it at 1500M with no
+swap, so if it ever grows past that the kernel kills the service rather than
+pushing the site into swap.  `systemctl status clip-search` shows current use.
+
+The service reads its data once.  After replacing the data files, restart it;
+search is unavailable for those few seconds:
+
+    sudo systemctl restart clip-search
+
+To turn it off:
+
+    sudo systemctl disable --now clip-search
+
+The unit file is copied, not linked, so a change to it in the repository does
+nothing until it is copied again and daemon-reload is run.
