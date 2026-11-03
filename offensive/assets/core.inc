@@ -575,17 +575,118 @@
 		throw new Exception("unimplemented", 404);
 	}
 
-	// XXX: unimplemented (broken)
+	/*
+	 * Turn what someone typed into a comment search: an InnoDB BOOLEAN MODE
+	 * string that requires every word, plus phrases to check with LIKE.
+	 * Returns null when nothing searchable is left.
+	 *
+	 * Only operators this function writes reach MATCH(), because raw input
+	 * can be a syntax error there (an unclosed quote, a stray paren).
+	 * Supported: plain words, "quoted phrases", -excluded, prefix*.
+	 *
+	 * Phrases don't use the "..." operator: InnoDB's phrase matching on common
+	 * words takes about a minute on a few million rows and ignores
+	 * max_statement_time.  Their words are required instead, and the phrase
+	 * itself is checked with LIKE on the rows that match.
+	 *
+	 * A required (+) word that the index never stores matches nothing, so
+	 * words shorter than innodb_ft_min_token_size (3) and InnoDB's default
+	 * stopwords are dropped instead of required.  Keep the list in step with
+	 * the server if innodb_ft_server_stopword_table is ever set.
+	 *
+	 * Bytes >= 0x80 count as word characters: the column and connection are
+	 * latin1 holding UTF-8 bytes, so the server sees them as latin1 letters.
+	 */
+	function comment_search_terms($q)
+	{
+		static $stopwords = [
+			"about", "are", "com", "for", "from", "how", "that", "the", "this",
+			"und", "was", "what", "when", "where", "who", "will", "with", "www",
+		];
+		$word = '[A-Za-z0-9_\x80-\xFF]+';
+		$indexable = function($w) use ($stopwords) {
+			return strlen($w) >= 3 && !in_array(strtolower($w), $stopwords);
+		};
+
+		preg_match_all('/((?<=^|\s)-)?(?:"([^"]*)"?|('.$word.')(\*?))/', $q, $matches, PREG_SET_ORDER);
+
+		$terms = [];
+		$phrases = [];
+		$required = 0;
+		foreach($matches as $m) {
+			$not = isset($m[1]) && $m[1] === "-";
+			if(isset($m[3]) && $m[3] !== "") {
+				$w = $m[3];
+				$prefix = isset($m[4]) && $m[4] === "*";
+				if(!$indexable($w) && !($prefix && strlen($w) >= 3)) continue;
+				$terms[] = ($not ? "-" : "+").$w.($prefix ? "*" : "");
+				if(!$not) $required++;
+			} else {
+				$phrase = trim(preg_replace('/\s+/', " ", $m[2]));
+				if($phrase === "") continue;
+				$phrases[] = ["text" => $phrase, "not" => $not];
+				// an excluded phrase can't exclude its words: "-good dog" still
+				// matches "good" and "dog" on their own
+				if($not) continue;
+				preg_match_all('/'.$word.'/', $phrase, $pw);
+				foreach(array_filter($pw[0], $indexable) as $w) {
+					$terms[] = "+".$w;
+					$required++;
+				}
+			}
+			// bound the cost of a pasted paragraph
+			if(count($terms) + count($phrases) >= 20) break;
+		}
+
+		// MATCH() needs a required word, or this is a table scan
+		if($required == 0) return null;
+		return ["match" => implode(" ", array_unique($terms)), "phrases" => $phrases];
+	}
+
+	/*
+	 * Comment search, newest first.  Uses the FULLTEXT index on
+	 * offensive_comments.comment (admin/database/2026-11-03.sql).
+	 *
+	 * The cost is the number of comments containing the words, not the page
+	 * size, so a search for only very common words is cut off after a couple
+	 * of seconds and answers 413.
+	 */
 	function core_searchcomments($args) {
 		if(!is_array($args)) {
 			throw new Exception("args is not an array");
 		}
-			
-		$q = check_arg("q", "string", $method);
-		$limit = check_arg("limit", "limit", $method, false);
+
+		$q = check_arg("q", "string", $args);
+		$limit = check_arg("limit", "limit", $args, false);
 		handle_errors();
-		
-		throw new Exception("not implemented :(", 404);
+
+		$terms = comment_search_terms($q);
+		if($terms === null) {
+			return [];
+		}
+
+		$sql = commentsql()
+		     ." AND MATCH(com.comment) AGAINST('".sqlEscape($terms["match"])."' IN BOOLEAN MODE)";
+		foreach($terms["phrases"] as $phrase) {
+			$like = addcslashes($phrase["text"], "\\%_");
+			$sql .= " AND com.comment ".($phrase["not"] ? "NOT " : "")."LIKE '%".sqlEscape($like)."%'";
+		}
+		$sql .= " ORDER BY com.id DESC LIMIT $limit";
+
+		global $link;
+		$result = tmbo_query("SET STATEMENT max_statement_time = 3 FOR $sql", 2, false);
+		if($result === false) {
+			if(mysqli_errno($link) == 1969) { // ER_STATEMENT_TIMEOUT
+				throw new Exception("search too broad", 413);
+			}
+			trigger_error(mysqli_error($link)." query '$sql'", E_USER_ERROR);
+		}
+
+		$ret = [];
+		while($result && $row = mysqli_fetch_assoc($result)) {
+			$ret[] = new Comment($row);
+		}
+		return $ret;
 	}
 
 	function core_searchuser($args) {

@@ -171,7 +171,8 @@ CREATE TABLE `offensive_comments` (
   KEY `userid` (`userid`),
   KEY `userid_fileid` (`userid`,`fileid`),
   KEY `userid_timestamp` (`userid`,`timestamp`),
-  KEY `userid_fileid_commentid` (`id`,`userid`,`fileid`)
+  KEY `userid_fileid_commentid` (`id`,`userid`,`fileid`),
+  FULLTEXT KEY `comment_text` (`comment`)
 ) ENGINE=InnoDB AUTO_INCREMENT=276172016 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -358,7 +358,6 @@ $timelimit = 10;
 		<a href="https://github.com/nrk/predis" title="to get to things">Predis</a>,
 		<a href="http://jquery.com/" title="for fancy dynamic things">jQuery</a>,
 		<a href="http://www.imagemagick.org" title="for messing with images">ImageMagick</a>,
-		<a href="http://xapian.org" title="for comment search">Xapian</a>,
 		natural flavor.<br />
 		Not a significant source of calcium, iron, dietary fiber, vitamin D, and sanity.
 	</div>

@@ -144,7 +144,7 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext = n
 						while(ob_get_level() > 0) {
 							ob_end_clean();
 						}
-						// the failing code may have changed the include path (search.inc does)
+						// the failing code may have changed the include path
 						set_include_path(dirname(__DIR__, 2));
 						require("offensive/index.outoforder.php");
 					} else if (array_key_exists("status", $_SESSION) &&
@@ -173,7 +173,7 @@ function tmbo_exception_handler($e) {
 	
 	if((!me() || me()->status() != "admin") && ob_get_level() > 0) {
 		ob_end_clean();
-		// the failing code may have changed the include path (search.inc does), and
+		// the failing code may have changed the include path, and
 		// file_exists() doesn't use it anyway
 		$root = dirname(__DIR__, 2);
 		set_include_path($root);
@@ -223,7 +223,9 @@ function time_end($time) {
 	return microtime(true) - $time;
 }
 
-function tmbo_query($sql, $timeout=2) {
+// $fatal = false returns false on a query error instead of failing the request,
+// for callers that handle it (see mysqli_errno()).
+function tmbo_query($sql, $timeout=2, $fatal=true) {
 	global $link, $queries, $querytime;
 	
 	if(!$link) {
@@ -242,9 +244,11 @@ function tmbo_query($sql, $timeout=2) {
 
 	time_start($time);
 		
-	$result = mysqli_query($link, $sql) or 
-		tmbo_error_handler(E_USER_ERROR, mysqli_error($link)." query '$sql'", 
+	$result = mysqli_query($link, $sql);
+	if($result === false && $fatal) {
+		tmbo_error_handler(E_USER_ERROR, mysqli_error($link)." query '$sql'",
 		                   $trace['file'], $trace['line'], null);
+	}
 	$time = time_end($time);
 	$querytime += $time;
 

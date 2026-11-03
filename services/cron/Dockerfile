@@ -1,4 +1,4 @@
-# Same PHP as the php service, so admin/commentIndexer.php runs on 8.4.
+# Same PHP as the php service.
 FROM php:8.4-cli
 
 RUN docker-php-ext-install mysqli
