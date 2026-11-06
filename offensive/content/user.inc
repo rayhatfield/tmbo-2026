@@ -163,6 +163,7 @@
 							
 							if( me()->id() == $usrid ) {
 								uploadAvatarForm();
+								?><p><a href="<?= Link::content("chpw") ?>">change your password</a></p><?php
 							}
 							
 							
