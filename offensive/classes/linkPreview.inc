@@ -17,8 +17,11 @@
  * arbitrary hosts.
  *
  * to add a provider, add an entry to providers(): "pattern" captures an id
- * from the url, "url" turns that id back into the canonical url (%s is the
- * id), and "oembed" is the provider's oEmbed endpoint.
+ * from the url (its first group, or what "id" makes of the matches), "url"
+ * turns that id back into the canonical url (%s is the id), and either
+ * "oembed" is the provider's oEmbed endpoint or "page" says to read the
+ * og: tags of the canonical url itself, for providers whose oEmbed has no
+ * title or thumbnail.  "images" is the host a page's thumbnail must be on.
  */
 class LinkPreview {
 	const REFRESH_AGE = 2592000; // 30 days
@@ -27,6 +30,8 @@ class LinkPreview {
 	const FETCH_TIMEOUT = 2;
 	const MAX_FETCHES = 50;      // per request, fetched all at once
 	const MAX_SERIAL_FETCHES = 10; // per request, one at a time without curl
+	const USER_AGENT = "tmbo-linkpreview/1.0";
+	const ACCEPT = "application/json, text/html;q=0.9";
 
 	private static $queue = array();
 
@@ -37,6 +42,20 @@ class LinkPreview {
 				"url" => "https://www.youtube.com/watch?v=%s",
 				"oembed" => "https://www.youtube.com/oembed?format=json&url=",
 			),
+			// imgur's oEmbed has neither a title nor a thumbnail, but its pages'
+			// og: tags have both.  a post that's gone has only the site's tags.
+			"imgur" => array(
+				"pattern" => '/^https?:\/\/(?:(?:www|m)\.)?imgur\.com\/(gallery|a)\/(?:[\w-]*-)?([A-Za-z0-9]{5,7})(?![\w-])|^https?:\/\/(?:(?:www|m)\.)?imgur\.com\/()([A-Za-z0-9]{7})(?![\w-])|^https?:\/\/i\.imgur\.com\/()([A-Za-z0-9]{5,7})[hlmst]?\.[a-z0-9]{3,4}(?![\w-])/i',
+				"id" => function($m) {
+					// whichever alternative matched: a gallery or album, or one image
+					$m = array_values(array_filter(array_slice($m, 1), "strlen"));
+					return count($m) == 2 ? strtolower($m[0])."/".$m[1] : $m[0];
+				},
+				"url" => "https://imgur.com/%s",
+				"name" => "Imgur",
+				"page" => true,
+				"images" => "i.imgur.com",
+			),
 		);
 	}
 
@@ -44,7 +63,7 @@ class LinkPreview {
 	private static function identify($url) {
 		foreach(self::providers() as $name => $provider) {
 			if(preg_match($provider["pattern"], $url, $matches)) {
-				return array($name, $matches[1]);
+				return array($name, isset($provider["id"]) ? $provider["id"]($matches) : $matches[1]);
 			}
 		}
 		return null;
@@ -151,7 +170,8 @@ class LinkPreview {
 				if(!$redis->set("$key:lock", 1, "EX", 60, "NX")) continue;
 
 				list($name, $id) = $q["match"];
-				$urls[$key] = $providers[$name]["oembed"].rawurlencode(sprintf($providers[$name]["url"], $id));
+				$url = sprintf($providers[$name]["url"], $id);
+				$urls[$key] = isset($providers[$name]["page"]) ? $url : $providers[$name]["oembed"].rawurlencode($url);
 			}
 
 			$responses = function_exists("curl_multi_init") ? self::requestAll($urls) : array_map(array("LinkPreview", "request"), $urls);
@@ -200,7 +220,8 @@ class LinkPreview {
 				CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
 				CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
 				CURLOPT_TIMEOUT => self::FETCH_TIMEOUT,
-				CURLOPT_HTTPHEADER => array("Accept: application/json"),
+				CURLOPT_USERAGENT => self::USER_AGENT,
+				CURLOPT_HTTPHEADER => array("Accept: ".self::ACCEPT),
 			));
 			curl_multi_add_handle($multi, $handle);
 			$handles[$key] = $handle;
@@ -226,7 +247,8 @@ class LinkPreview {
 		$context = stream_context_create(array("http" => array(
 			"timeout" => self::FETCH_TIMEOUT,
 			"ignore_errors" => true,
-			"header" => "Accept: application/json\r\n",
+			"user_agent" => self::USER_AGENT,
+			"header" => "Accept: ".self::ACCEPT."\r\n",
 		)));
 		$body = @file_get_contents($url, false, $context);
 		// $http_response_header holds every response along any redirects;
@@ -241,8 +263,11 @@ class LinkPreview {
 		return array((int)$m[1], $body);
 	}
 
-	// the preview in an oEmbed response, or null if it doesn't have one.
+	// the preview in an oEmbed response or a page, or null if it doesn't have one.
 	private static function parse($name, $body) {
+		$providers = self::providers();
+		if(isset($providers[$name]["page"])) return self::parsePage($providers[$name], $body);
+
 		$data = json_decode($body, true);
 		if(!is_array($data) || !isset($data["title"]) || !is_string($data["title"])) {
 			return null;
@@ -256,6 +281,44 @@ class LinkPreview {
 		if(isset($data["thumbnail_url"]) && is_string($data["thumbnail_url"]) &&
 		   preg_match('/^https:\/\/[^\s"\'<>]+$/', $data["thumbnail_url"])) {
 			$preview["thumbnail"] = $data["thumbnail_url"];
+		}
+		return $preview;
+	}
+
+	/*
+	 * the preview in a page's og: (or twitter:) tags: its title, and a
+	 * thumbnail on the provider's image host.  null without a title.
+	 */
+	private static function parsePage($provider, $body) {
+		$meta = array();
+		$doc = new DOMDocument();
+		$errors = libxml_use_internal_errors(true);
+		// the xml declaration makes libxml read the page as utf-8
+		$loaded = $doc->loadHTML('<?xml encoding="utf-8"?>'.$body, LIBXML_NONET);
+		libxml_clear_errors();
+		libxml_use_internal_errors($errors);
+		if(!$loaded) return null;
+
+		foreach($doc->getElementsByTagName("meta") as $tag) {
+			$name = $tag->getAttribute("property") ?: $tag->getAttribute("name");
+			if($name != "" && !isset($meta[$name])) $meta[$name] = trim($tag->getAttribute("content"));
+		}
+		if(!isset($meta["og:title"]) || $meta["og:title"] == "") return null;
+
+		$preview = array(
+			"title" => mb_substr($meta["og:title"], 0, 200),
+			"provider" => isset($meta["og:site_name"]) && $meta["og:site_name"] != "" ? $meta["og:site_name"] : $provider["name"],
+		);
+		// twitter:image is the larger, cleaner one on imgur; either way drop
+		// the query (imgur adds ?fb) and only take images from the provider
+		foreach(array("twitter:image", "og:image") as $name) {
+			if(!isset($meta[$name])) continue;
+			$parts = parse_url($meta[$name]);
+			if(isset($parts["scheme"], $parts["host"], $parts["path"]) && $parts["scheme"] == "https" &&
+			   strtolower($parts["host"]) == $provider["images"] && preg_match('/^\/[\w.-]+$/', $parts["path"])) {
+				$preview["thumbnail"] = "https://".$provider["images"].$parts["path"];
+				break;
+			}
 		}
 		return $preview;
 	}
