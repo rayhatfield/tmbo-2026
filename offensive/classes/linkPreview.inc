@@ -17,24 +17,28 @@
  * arbitrary hosts.
  *
  * to add a provider, add an entry to providers(): "pattern" captures an id
- * from the url (its first group, or what "id" makes of the matches), "url"
- * turns that id back into the canonical url (%s is the id), and either
- * "oembed" is the provider's oEmbed endpoint or "page" says to read the
- * og: tags of the canonical url itself, for providers whose oEmbed has no
- * title or thumbnail.  "images" is the host a page's thumbnail must be on.
+ * from the url, "url" turns that id back into the canonical url (%s is the
+ * id), and "oembed" is the provider's oEmbed endpoint.
  */
 class LinkPreview {
 	const REFRESH_AGE = 2592000; // 30 days
 	const MISS_TTL = 86400;      // the provider says no (deleted, private): retry daily
 	const RETRY_TTL = 900;       // timeouts, rate limits, outages: retry soon
 	const FETCH_TIMEOUT = 2;
-	const MAX_FETCHES = 50;      // per request, fetched all at once
-	const MAX_SERIAL_FETCHES = 10; // per request, one at a time without curl
 	const USER_AGENT = "tmbo-linkpreview/1.0";
 	const ACCEPT = "application/json, text/html;q=0.9";
+	const MAX_FETCHES = 50;      // per request, fetched all at once
+	const MAX_SERIAL_FETCHES = 10; // per request, one at a time without curl
 
 	private static $queue = array();
 
+	/*
+	 * a provider without "oembed" has "page" instead: its canonical url is
+	 * fetched and read for og: tags, for providers whose oEmbed has no title
+	 * or thumbnail.  "id" turns the pattern's matches into the id when the
+	 * first group isn't enough, and "images" is the only host a page's
+	 * thumbnail may come from.
+	 */
 	private static function providers() {
 		return array(
 			"youtube" => array(
