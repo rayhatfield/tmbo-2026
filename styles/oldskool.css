@@ -248,12 +248,20 @@ form.fieldform > [type="submit"] {
     }
 }
 
-/* "<n> older" above and "<n> newer" below a paged thread */
+/* first, older and view all above a paged thread; newer, latest and view
+   all below it */
 #commentList nav {
+    display: flex;
+    flex-wrap: wrap;
     flex-basis: 100%;
+    column-gap: calc(2 * var(--spacing, 10px));
     padding-block: var(--spacing, 10px);
     font-weight: bold;
-    text-align: center;
+
+    /* view all / view paginated goes on the right */
+    a:last-child {
+        margin-left: auto;
+    }
 }
 
 .textlinks, .textlinks a {
