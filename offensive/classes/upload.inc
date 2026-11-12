@@ -289,28 +289,68 @@ class Upload {
 	 * comment slinging code
 	 */
 	public function getComments() {
-		if(!$this->exists()) {
-			require("offensive/404.php");
-		}
 		if(!array_key_exists("thecomments", $this->data)) {
-			$this->data["thecomments"] = array();
-			
-			$sql = "SELECT com.*,
-			               u.userid AS user_userid,
-			               u.username AS user_username,
-			               u.created AS user_created,
-			               u.account_status AS user_account_status,
-			               u.timestamp AS user_timestamp
-			        FROM offensive_comments com, users u
-			        WHERE u.userid = com.userid AND fileid = ".$this->data["id"].
-			       " ORDER BY timestamp ASC";
-			$result = tmbo_query($sql);
-			while($row = mysqli_fetch_assoc($result)) {
-				$this->data["thecomments"][] = new Comment($row);
-			}
+			$this->data["thecomments"] = $this->getCommentRange(0, false);
 		}
 		
 		return $this->data["thecomments"];
+	}
+
+	/*
+	 * up to $limit comments (false for all of them) starting at the
+	 * $offset'th, oldest first. comment ids increase with time, and the
+	 * fileid index is (fileid, id) to InnoDB, so ordering by id reads the
+	 * index in order instead of sorting the thread. STRAIGHT_JOIN keeps the
+	 * optimizer from starting at users, which would sort the thread again.
+	 */
+	public function getCommentRange($offset, $limit) {
+		if(!$this->exists()) {
+			require("offensive/404.php");
+		}
+
+		$sql = "SELECT com.*,
+		               u.userid AS user_userid,
+		               u.username AS user_username,
+		               u.created AS user_created,
+		               u.account_status AS user_account_status,
+		               u.timestamp AS user_timestamp
+		        FROM offensive_comments com
+		        STRAIGHT_JOIN users u ON u.userid = com.userid
+		        WHERE com.fileid = ".(int)$this->data["id"].
+		       " ORDER BY com.id ASC";
+		if($limit !== false) {
+			$sql .= " LIMIT ".(int)$offset.", ".(int)$limit;
+		}
+		$comments = array();
+		$result = tmbo_query($sql);
+		while($row = mysqli_fetch_assoc($result)) {
+			$comments[] = new Comment($row);
+		}
+		return $comments;
+	}
+
+	/*
+	 * how many of this thread's comments come before comment $commentid
+	 */
+	public function commentIndex($commentid) {
+		$sql = "SELECT COUNT(*) AS n FROM offensive_comments
+		        WHERE fileid = ".(int)$this->id()." AND id < ".(int)$commentid;
+		$row = mysqli_fetch_assoc(tmbo_query($sql));
+		return (int)$row["n"];
+	}
+
+	/*
+	 * the [ this is good ] and [ this is bad ] votes among the comments
+	 * before comment $commentid, so a later page's running tally starts
+	 * where the previous page's left off
+	 */
+	public function votesBefore($commentid) {
+		$sql = "SELECT COALESCE(SUM(vote = 'this is good'), 0) AS good,
+		               COALESCE(SUM(vote = 'this is bad'), 0) AS bad
+		        FROM offensive_comments
+		        WHERE fileid = ".(int)$this->id()." AND id < ".(int)$commentid;
+		$row = mysqli_fetch_assoc(tmbo_query($sql));
+		return array((int)$row["good"], (int)$row["bad"]);
 	}
 	
 	/*

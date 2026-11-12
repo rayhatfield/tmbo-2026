@@ -78,6 +78,10 @@
 
 	function head_post_js() {
 		global $upload;
+		// new comments arrive at the end of the thread, so only its last page
+		// shows them as they're posted. elsewhere the comment form posts
+		// normally and lands on the new comment's page.
+		if(commentPage()["hasNext"]) return;
 		?>
 		<script type="text/javascript">
 			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
@@ -243,10 +247,102 @@
 
 	}
 
+	// digits only, and few enough that arithmetic on it stays an int
+	function isCount($value) {
+		return is_string($value) && strlen($value) <= 9 && ctype_digit($value);
+	}
+
+	/*
+	 * the page of the thread to show. ?limit= (a number or "all") overrides
+	 * the viewer's comments_per_page preference, ?offset= is the index of the
+	 * first comment shown, and ?comment= (from Link::comment) picks the page
+	 * that comment is on.
+	 */
+	function commentPage() {
+		global $upload;
+		static $page = null;
+		if($page !== null) return $page;
+
+		$fromUrl = array_key_exists("limit", $_GET) && is_string($_GET["limit"]);
+		$limit = $fromUrl ? $_GET["limit"] : me()->getPref("comments_per_page");
+		if($limit === "all") {
+			$limit = false;
+		} else if(isCount($limit) && (int)$limit > 0) {
+			$limit = (int)$limit;
+		} else {
+			// a bad ?limit= or preference gets the default
+			$fromUrl = false;
+			$limit = 250;
+		}
+
+		$offset = 0;
+		if($limit !== false) {
+			if(array_key_exists("comment", $_GET) && isCount($_GET["comment"])) {
+				$comment = new Comment((int)$_GET["comment"]);
+				if($comment->exists() && $comment->upload()->id() == $upload->id()) {
+					$index = $upload->commentIndex($comment->id());
+					$offset = $index - $index % $limit;
+				}
+			} else if(array_key_exists("offset", $_GET) && isCount($_GET["offset"])) {
+				$offset = (int)$_GET["offset"];
+			}
+		}
+
+		// one more than the page holds, to know whether there's a next page
+		$comments = $upload->getCommentRange($offset, $limit === false ? false : $limit + 1);
+		$hasNext = $limit !== false && count($comments) > $limit;
+		if($hasNext) array_pop($comments);
+
+		$page = array(
+			"limit" => $limit,
+			"limitFromUrl" => $fromUrl,
+			"offset" => $offset,
+			"comments" => $comments,
+			"hasPrev" => $offset > 0,
+			"hasNext" => $hasNext,
+		);
+		return $page;
+	}
+
+	/*
+	 * previous page, all, next page. a missing page is a link with no href.
+	 * nothing when the whole thread is on the page anyway.
+	 */
+	function pageNav() {
+		global $upload;
+		$page = commentPage();
+		$thread = Link::thread($upload);
+
+		if($page["limit"] === false) {
+			// only offer pages to someone who came here with ?limit=all
+			if(!$page["limitFromUrl"] || me()->getPref("comments_per_page") === "all") return;
+			?><nav class="heading"><a href="<?= htmlEscape($thread) ?>">show pages</a></nav><?php
+			return;
+		}
+		if(!$page["hasPrev"] && !$page["hasNext"]) return;
+
+		$pageLink = function($offset) use ($thread, $page) {
+			$args = array();
+			if($offset > 0) $args["offset"] = $offset;
+			if($page["limitFromUrl"]) $args["limit"] = $page["limit"];
+			return htmlEscape($thread.(count($args) ? "&".http_build_query($args) : ""));
+		};
+		$prev = $page["hasPrev"] ? ' href="'.$pageLink(max(0, $page["offset"] - $page["limit"])).'"' : ' aria-disabled="true"';
+		$next = $page["hasNext"] ? ' href="'.$pageLink($page["offset"] + $page["limit"]).'"' : ' aria-disabled="true"';
+		?>
+		<nav class="heading">
+			<a<?= $prev ?>>&laquo; previous page</a>
+			<a href="<?= htmlEscape($thread."&limit=all") ?>">all</a>
+			<a<?= $next ?>>next page &raquo;</a>
+		</nav>
+		<?php
+	}
+
 	function body() {
 		global $upload, $uploader;
-	
-		$comments_exist = count($upload->getComments()) > 0;
+
+		$page = commentPage();
+		$comments_exist = count($page["comments"]) > 0 || $page["hasPrev"];
 	
 		$comments_heading = "the dorks who came before you said:";
 		$add_comment_heading = $comments_exist ? "and then you came along and were all:" : "you were first on the scene and were all:";
@@ -281,6 +377,7 @@
 		global $activeTab;
 		$activeTab = "discussions";
 		tabs();
+		pageNav();
 ?>
 	
 		<div id="commentList" class="bluebox" style="text-align:left">	
@@ -295,9 +392,14 @@
 			?><div><b><?= $comments_heading ?></b><label><input type="checkbox" id="link_previews" name="link_previews" aria-label="show link previews" /><span>show</span><span>hide</span> link previews</label></div><?php
         }
 
+		// templates/comment.inc keeps the running tally in these globals
+		global $numgood, $numbad;
 		$numgood = 0;
 		$numbad = 0;
-		foreach($upload->getComments() as $comment) {
+		if($page["hasPrev"] && count($page["comments"])) {
+			list($numgood, $numbad) = $upload->votesBefore($page["comments"][0]->id());
+		}
+		foreach($page["comments"] as $comment) {
 			$lastcomment = $comment->id();
 			require("offensive/templates/comment.inc");
 		}
@@ -339,10 +441,31 @@
 		
 
 			</div>
+			<?php pageNav(); ?>
                         <?php // outside #commentList so it doesn't throw off the .entry:nth-child striping ?>
                         <script>
                                 lastcomment = <?php echo $lastcomment ?>;
                         </script>
+			<?php if($page["limit"] !== false) { ?>
+			<script>
+				// a link from before threads had pages names its comment only in
+				// the fragment, which never reaches the server: if the comment
+				// isn't on this page, ask for the page it's on
+				(function() {
+					function findComment() {
+						var id = location.hash.slice(1);
+						if(!/^\d+$/.test(id) || document.getElementById(id)) return;
+						var url = new URL(location.href);
+						if(url.searchParams.get("comment") === id) return;
+						url.searchParams.set("comment", id);
+						url.searchParams.delete("offset");
+						location.replace(url.href);
+					}
+					findComment();
+					window.addEventListener("hashchange", findComment);
+				})();
+			</script>
+			<?php } ?>
 			<div class="heading">
 				<div style="float:right">					
 					<?php if( $upload->subscribed() ) { ?>

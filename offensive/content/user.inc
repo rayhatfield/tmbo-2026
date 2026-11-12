@@ -244,8 +244,7 @@ function recentComments( $uid ) {
 		$seen[$upload->id()] = true;
 		$count++;
 
-		// XXX: rejigger the query and use Link::comment
-		?><li><div><a href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></li><?php
+		?><li><div><a href="<?= Link::threadComment($upload, $row['commentid']) ?>"><?= $upload->htmlFilename() ?></a></div></li><?php
 
 	}
 ?>

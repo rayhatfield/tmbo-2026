@@ -62,7 +62,16 @@ class Link {
 			$comment = new Comment($comment);
 		}
 
-		return Link::thread($comment->upload())."#".$comment->id();
+		return Link::threadComment($comment->upload(), $comment->id());
+	}
+
+	/*
+	 * comment $commentid in $upload's thread. the comment parameter tells
+	 * the thread which page it's on, and the fragment scrolls to it.
+	 */
+	static function threadComment($upload, $commentid) {
+		$commentid = (int)$commentid;
+		return Link::thread($upload)."&comment=".$commentid."#".$commentid;
 	}
 
 	static function user($user) {

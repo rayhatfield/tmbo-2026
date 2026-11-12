@@ -140,6 +140,21 @@
 		</div>
 	</div>
 
+	<div class="heading">comment threads:</div>
+	<div class="bluebox">
+		<p>long threads are split into pages so you don't have to scroll forever. you can still see a whole thread from the "all" link on any page.</p>
+		<div style="text-align:center">
+			<span><?php
+				require("offensive/data/preferences.inc");
+				if(me()->getPref("comments_per_page") == "all") { ?>
+					<a href="<?= Link::setPref("comments_per_page", "") ?>">show <?= $prefdefaults["comments_per_page"] ?> comments per page</a>
+				<?php } else { ?>
+					<a href="<?= Link::setPref("comments_per_page", "all") ?>">show whole threads on one page</a>
+				<?php } ?>
+			</span>
+		</div>
+	</div>
+
 	<div class="heading">email address:</div>
 	<div class="bluebox">
 		<?php

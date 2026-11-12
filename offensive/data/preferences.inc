@@ -18,6 +18,8 @@ $prefnames = array(
 	
 	// indicates if the user wants to view thumbnails in comments
 	"thumbnails_in_comments",
+	// comments per page in a thread, or "all" for the whole thread on one page
+	"comments_per_page",
 	
 	// pickup id for images
 	"ipickup",
@@ -54,7 +56,8 @@ $prefnames = array(
 $prefdefaults = array(
 	"index" => "main",
 	"sortorder_discussions" => "date_desc",
-	"thumbnails_in_comments" => "1"
+	"thumbnails_in_comments" => "1",
+	"comments_per_page" => "250"
 );
 
 ?>

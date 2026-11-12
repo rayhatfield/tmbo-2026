@@ -145,7 +145,7 @@ $timelimit = 10;
 			});
 
 			socket.on('subscription', function(comment) {
-				var link = '/offensive/?c=comments&fileid=' + comment.fileid + '#' + comment.id;
+				var link = '/offensive/?c=comments&fileid=' + comment.fileid + '&comment=' + comment.id + '#' + comment.id;
 				var existing = $('#unread' + comment.fileid);
 				if (existing.length > 0) {
 					existing.attr('href', link);

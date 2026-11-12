@@ -35,8 +35,8 @@
 	
 		while( $row = mysqli_fetch_assoc( $result ) ) {
 			$css = $css == "evenfile" ? "oddfile" : "evenfile";
-			// XXX: rejigger the query and use Link::comment ?>
-			<div class="clipper"><a class="<?= $css ?>" href="<?= Link::thread(new Upload($row)) ?>#<?= $row['commentid']?>"><?= htmlspecialchars( $row['filename'] ) ?></a></div>
+			?>
+			<div class="clipper"><a class="<?= $css ?>" href="<?= Link::threadComment(new Upload($row), $row['commentid']) ?>"><?= htmlspecialchars( $row['filename'] ) ?></a></div>
 	<?php
 	
 		}

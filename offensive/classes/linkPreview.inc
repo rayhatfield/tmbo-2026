@@ -119,10 +119,10 @@ class LinkPreview {
 
 	/*
 	 * the preview for a link to tmbo itself: a pic (pages/pic.php?id=), a
-	 * thread (?c=comments&fileid=), or a comment in one (a thread link ending
-	 * in #commentid).  null if $url isn't one of those, false if it is but
-	 * there's nothing to show: it's gone, its poster is squelched, or this
-	 * page already has MAX_INTERNAL.
+	 * thread (?c=comments&fileid=), or a comment in one (a thread link with
+	 * &comment=commentid, or ending in #commentid). null if $url isn't one
+	 * of those, false if it is but there's nothing to show: it's gone, its
+	 * poster is squelched, or this page already has MAX_INTERNAL.
 	 */
 	private static function internal($url) {
 		$parts = parse_url($url);
@@ -145,7 +145,8 @@ class LinkPreview {
 		} else if(preg_match('/^\/offensive\/(?:index\.php)?$/', $parts["path"]) &&
 		          isset($query["c"]) && $query["c"] === "comments") {
 			$fileid = $number($query, "fileid");
-			$commentid = $number($parts, "fragment");
+			$commentid = $number($query, "comment");
+			if(!$commentid) $commentid = $number($parts, "fragment");
 		} else {
 			return null;
 		}

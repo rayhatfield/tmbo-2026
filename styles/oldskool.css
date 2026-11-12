@@ -248,6 +248,22 @@ form.fieldform > [type="submit"] {
     }
 }
 
+/* previous page, all, next page above and below a paged thread */
+nav.heading {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing, 10px);
+
+    a:is(:link, :visited) {
+        color: inherit;
+    }
+
+    /* no href: there's no page that way */
+    a:not([href]) {
+        color: var(--color-brand-medium);
+    }
+}
+
 .textlinks, .textlinks a {
 	color: var(--text-muted);
 	font-size:11px;
