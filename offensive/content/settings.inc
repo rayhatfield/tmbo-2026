@@ -142,7 +142,7 @@
 
 	<div class="heading">comment threads:</div>
 	<div class="bluebox">
-		<p>long threads are split into pages so you don't have to scroll forever. you can still see a whole thread from the "all" link on any page.</p>
+		<p>long threads are split into pages so you don't have to scroll forever. you can still see a whole thread with the "show all" link at the bottom of it.</p>
 		<div style="text-align:center">
 			<span><?php
 				require("offensive/data/preferences.inc");

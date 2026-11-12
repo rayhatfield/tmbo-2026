@@ -142,10 +142,8 @@
                                         entry = entry.first();
 					if($.inArray(comment.userid, me.squelched) != -1)
                                                 entry.find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
-					// after the last comment: before the page links or the thumbnail
-					var end = document.querySelector('#commentList > .entry ~ nav, #thumbnail');
-					if (end)
-						$(end).before(html);
+					if ($('#thumbnail').length > 0)
+						$('#thumbnail').before(html);
 					else
 						$("#commentList").append(html);
                                         if (entry.length == 0)
@@ -290,54 +288,83 @@
 			}
 		}
 
-		// one more than the page holds, to know whether there's a next page
-		$comments = $upload->getCommentRange($offset, $limit === false ? false : $limit + 1);
-		$hasNext = $limit !== false && count($comments) > $limit;
-		if($hasNext) array_pop($comments);
+		$total = false;
+		if($limit !== false) {
+			$total = $upload->commentCount();
+			// past the end of the thread: show its last page
+			if($offset >= $total && $total > 0) {
+				$offset = ($total - 1) - ($total - 1) % $limit;
+			}
+		}
+		$comments = $upload->getCommentRange($offset, $limit);
+		if($total === false) $total = count($comments);
+		$older = min($offset, $total);
+		$newer = max(0, $total - $offset - count($comments));
 
 		$page = array(
 			"limit" => $limit,
 			"limitFromUrl" => $fromUrl,
 			"offset" => $offset,
+			"total" => $total,
 			"comments" => $comments,
-			"hasPrev" => $offset > 0,
-			"hasNext" => $hasNext,
+			"older" => $older,
+			"newer" => $newer,
+			"hasPrev" => $older > 0,
+			"hasNext" => $newer > 0,
 		);
 		return $page;
 	}
 
+	// a page of the thread starting at comment $offset, keeping ?limit=
+	function pageLink($offset) {
+		global $upload;
+		$page = commentPage();
+		$args = array();
+		if($offset > 0) $args["offset"] = $offset;
+		if($page["limitFromUrl"]) $args["limit"] = $page["limit"];
+		return Link::thread($upload).(count($args) ? "&".http_build_query($args) : "");
+	}
+
+	// "<n> older" above the comments when there's a page before this one
+	function olderLink() {
+		$page = commentPage();
+		if(!$page["hasPrev"]) return;
+		?><nav><a href="<?= htmlEscape(pageLink(max(0, $page["offset"] - $page["limit"]))) ?>"><?= $page["older"] ?> older</a></nav><?php
+	}
+
+	// "<n> newer" below the comments when there's a page after this one
+	function newerLink() {
+		$page = commentPage();
+		if(!$page["hasNext"]) return;
+		?><nav><a href="<?= htmlEscape(pageLink($page["offset"] + $page["limit"])) ?>"><?= $page["newer"] ?> newer</a></nav><?php
+	}
+
 	/*
-	 * previous, show all, next. a missing page is a link with no href.
-	 * nothing when the whole thread is on the page anyway.
+	 * "show all" on a paged thread, "show paginated" on a whole thread that's
+	 * too long for one page. nothing, and false, when the thread fits on one
+	 * page.
 	 */
-	function pageNav() {
+	function pageToggle() {
 		global $upload;
 		$page = commentPage();
 		$thread = Link::thread($upload);
-
-		if($page["limit"] === false) {
-			// only offer pages to someone who came here with ?limit=all
-			if(!$page["limitFromUrl"] || me()->getPref("comments_per_page") === "all") return;
-			?><nav><a href="<?= htmlEscape($thread) ?>">show pages</a></nav><?php
-			return;
+		if($page["limit"] !== false) {
+			if(!$page["hasPrev"] && !$page["hasNext"]) return false;
+			?><a class="heading" href="<?= htmlEscape($thread."&limit=all") ?>">show all</a><?php
+			return true;
 		}
-		if(!$page["hasPrev"] && !$page["hasNext"]) return;
 
-		$pageLink = function($offset) use ($thread, $page) {
-			$args = array();
-			if($offset > 0) $args["offset"] = $offset;
-			if($page["limitFromUrl"]) $args["limit"] = $page["limit"];
-			return htmlEscape($thread.(count($args) ? "&".http_build_query($args) : ""));
-		};
-		$prev = $page["hasPrev"] ? ' href="'.$pageLink(max(0, $page["offset"] - $page["limit"])).'"' : ' aria-disabled="true"';
-		$next = $page["hasNext"] ? ' href="'.$pageLink($page["offset"] + $page["limit"]).'"' : ' aria-disabled="true"';
-		?>
-		<nav>
-			<a<?= $prev ?>>&laquo; previous</a>
-			<a href="<?= htmlEscape($thread."&limit=all") ?>">show all</a>
-			<a<?= $next ?>>next &raquo;</a>
-		</nav>
-		<?php
+		require("offensive/data/preferences.inc");
+		$paged = me()->getPref("comments_per_page");
+		$href = $thread;
+		if($paged === "all") {
+			// the preference says whole threads, so ask for pages explicitly
+			$paged = $prefdefaults["comments_per_page"];
+			$href .= "&limit=".$paged;
+		}
+		if($page["total"] <= (int)$paged) return false;
+		?><a class="heading" href="<?= htmlEscape($href) ?>">show paginated</a><?php
+		return true;
 	}
 
 	function body() {
@@ -390,9 +417,9 @@
         // changeblog doesn't say anything demeaning about the people who posted.
         if($upload->id() != "211604") { 
 			// one element, so it doesn't throw off the .entry:nth-child striping
-			?><div><b><?= $comments_heading ?></b><label><input type="checkbox" id="link_previews" name="link_previews" aria-label="show link previews" /><span>show</span><span>hide</span> link previews</label><?php pageNav(); ?></div><?php
+			?><div><b><?= $comments_heading ?></b><label><input type="checkbox" id="link_previews" name="link_previews" aria-label="show link previews" /><span>show</span><span>hide</span> link previews</label><?php olderLink(); ?></div><?php
         } else {
-			pageNav();
+			olderLink();
 		}
 
 		// templates/comment.inc keeps the running tally in these globals
@@ -406,7 +433,7 @@
 			$lastcomment = $comment->id();
 			require("offensive/templates/comment.inc");
 		}
-		pageNav();
+		newerLink();
 	// end of "are there any comments"
 	}
 	
@@ -484,7 +511,7 @@
 					<?php if ($upload->type() != "topic") { ?>
 						<a class="heading" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/>
 					<?php }
-						else {
+						if(!pageToggle() && $upload->type() == "topic") {
 						 ?>&nbsp;<?php
 						}
 					?>

@@ -329,6 +329,13 @@ class Upload {
 		return $comments;
 	}
 
+	// how many comments the thread has, counted from the fileid index
+	public function commentCount() {
+		$sql = "SELECT COUNT(*) AS n FROM offensive_comments WHERE fileid = ".(int)$this->id();
+		$row = mysqli_fetch_assoc(tmbo_query($sql));
+		return (int)$row["n"];
+	}
+
 	/*
 	 * how many of this thread's comments come before comment $commentid
 	 */
