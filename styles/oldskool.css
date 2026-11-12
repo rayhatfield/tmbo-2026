@@ -248,19 +248,18 @@ form.fieldform > [type="submit"] {
     }
 }
 
-/* previous page, all, next page above and below a paged thread */
-nav.heading {
+/* previous, show all, next above and below a paged thread */
+#commentList nav {
     display: flex;
+    flex-basis: 100%;
     justify-content: space-between;
     gap: var(--spacing, 10px);
-
-    a:is(:link, :visited) {
-        color: inherit;
-    }
+    padding-block: var(--spacing, 10px);
+    font-weight: bold;
 
     /* no href: there's no page that way */
     a:not([href]) {
-        color: var(--color-brand-medium);
+        color: var(--text-muted);
     }
 }
 

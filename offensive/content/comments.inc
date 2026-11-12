@@ -142,8 +142,10 @@
                                         entry = entry.first();
 					if($.inArray(comment.userid, me.squelched) != -1)
                                                 entry.find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
-					if ($('#thumbnail').length > 0)
-						$('#thumbnail').before(html);
+					// after the last comment: before the page links or the thumbnail
+					var end = document.querySelector('#commentList > .entry ~ nav, #thumbnail');
+					if (end)
+						$(end).before(html);
 					else
 						$("#commentList").append(html);
                                         if (entry.length == 0)
@@ -305,7 +307,7 @@
 	}
 
 	/*
-	 * previous page, all, next page. a missing page is a link with no href.
+	 * previous, show all, next. a missing page is a link with no href.
 	 * nothing when the whole thread is on the page anyway.
 	 */
 	function pageNav() {
@@ -316,7 +318,7 @@
 		if($page["limit"] === false) {
 			// only offer pages to someone who came here with ?limit=all
 			if(!$page["limitFromUrl"] || me()->getPref("comments_per_page") === "all") return;
-			?><nav class="heading"><a href="<?= htmlEscape($thread) ?>">show pages</a></nav><?php
+			?><nav><a href="<?= htmlEscape($thread) ?>">show pages</a></nav><?php
 			return;
 		}
 		if(!$page["hasPrev"] && !$page["hasNext"]) return;
@@ -330,10 +332,10 @@
 		$prev = $page["hasPrev"] ? ' href="'.$pageLink(max(0, $page["offset"] - $page["limit"])).'"' : ' aria-disabled="true"';
 		$next = $page["hasNext"] ? ' href="'.$pageLink($page["offset"] + $page["limit"]).'"' : ' aria-disabled="true"';
 		?>
-		<nav class="heading">
-			<a<?= $prev ?>>&laquo; previous page</a>
-			<a href="<?= htmlEscape($thread."&limit=all") ?>">all</a>
-			<a<?= $next ?>>next page &raquo;</a>
+		<nav>
+			<a<?= $prev ?>>&laquo; previous</a>
+			<a href="<?= htmlEscape($thread."&limit=all") ?>">show all</a>
+			<a<?= $next ?>>next &raquo;</a>
 		</nav>
 		<?php
 	}
@@ -377,7 +379,6 @@
 		global $activeTab;
 		$activeTab = "discussions";
 		tabs();
-		pageNav();
 ?>
 	
 		<div id="commentList" class="bluebox" style="text-align:left">	
@@ -389,8 +390,10 @@
         // changeblog doesn't say anything demeaning about the people who posted.
         if($upload->id() != "211604") { 
 			// one element, so it doesn't throw off the .entry:nth-child striping
-			?><div><b><?= $comments_heading ?></b><label><input type="checkbox" id="link_previews" name="link_previews" aria-label="show link previews" /><span>show</span><span>hide</span> link previews</label></div><?php
-        }
+			?><div><b><?= $comments_heading ?></b><label><input type="checkbox" id="link_previews" name="link_previews" aria-label="show link previews" /><span>show</span><span>hide</span> link previews</label><?php pageNav(); ?></div><?php
+        } else {
+			pageNav();
+		}
 
 		// templates/comment.inc keeps the running tally in these globals
 		global $numgood, $numbad;
@@ -403,6 +406,7 @@
 			$lastcomment = $comment->id();
 			require("offensive/templates/comment.inc");
 		}
+		pageNav();
 	// end of "are there any comments"
 	}
 	
@@ -441,7 +445,6 @@
 		
 
 			</div>
-			<?php pageNav(); ?>
                         <?php // outside #commentList so it doesn't throw off the .entry:nth-child striping ?>
                         <script>
                                 lastcomment = <?php echo $lastcomment ?>;
