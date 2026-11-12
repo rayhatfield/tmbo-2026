@@ -78,9 +78,9 @@
 
 	function head_post_js() {
 		global $upload;
-		// new comments arrive at the end of the thread, so only its last page
-		// shows them as they're posted. elsewhere the comment form posts
-		// normally and lands on the new comment's page.
+		// new comments arrive at the end of the thread, so only its last page,
+		// which is also the only one with the comment form, shows them as
+		// they're posted.
 		if(commentPage()["hasNext"]) return;
 		?>
 		<script type="text/javascript">
@@ -536,8 +536,9 @@
 	</div>
 
 <?php
-    // changeblog shouldn't tease the users with a comment field
-    if($upload->canComment()) {
+    // changeblog shouldn't tease the users with a comment field, and the
+    // form only goes at the end of the thread
+    if($upload->canComment() && !$page["hasNext"]) {
 ?>
 
 	<div class="contentbox">
