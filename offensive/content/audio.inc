@@ -87,7 +87,6 @@
 
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">
 		alright. listen up.
 	</div>
@@ -130,7 +129,6 @@
 			</div>
 		</div>
 	</div>
-	<div class="blackbar"></div>
 </div>
 <?php
 }

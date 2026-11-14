@@ -28,10 +28,10 @@ body {
 }
 
 .blackbar {
-        background: var(--border-dark);
-        height: 11px;
-        border-top: 1px solid var(--border-medium);
-        border-left: 1px solid var(--gray-dark);
+	background: var(--border-dark);
+	height: 11px;
+	border-top: 1px solid var(--border-medium);
+	border-left: 1px solid var(--gray-dark);
 }
 
 #pic_header {

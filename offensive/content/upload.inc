@@ -29,7 +29,6 @@
 		$uploadsRemaining = numUploadsRemaining();
 		?>
 		<div class="contentbox">
-			<div class="blackbar"></div>
 			<div class="heading"><?php
 				if($fileuploaded && $uploadsRemaining !== 0) {
 					echo "thank you, sir, may i have another?";
@@ -88,7 +87,6 @@
 				<?php } ?>
 			</div>		
 		</div>
-		<div class="blackbar"></div>
 	</div>
 	<?php
 	}

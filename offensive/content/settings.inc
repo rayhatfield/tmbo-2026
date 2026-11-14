@@ -102,7 +102,6 @@
 		global $key_options, $key_defaults; ?>
 
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">
 			set things up how you like 'em.
 	</div>
@@ -266,7 +265,7 @@
 					<td colspan="2">application: <?= htmlEscape((strlen($token->issued_to()) > 64) ? substr($token->issued_to(), 0, 61)."…" : $token->issued_to()) ?></td>
 				</tr>
 				<tr>
-                    <td colspan="2">token: <?= $token->tokenid() ?><?= $token->readonly() ? " (read only)" : "" ?></td>
+					<td colspan="2">token: <?= $token->tokenid() ?><?= $token->readonly() ? " (read only)" : "" ?></td>
 				</tr>
 				<tr>
 					<td>issued date: <?= $token->issue_date() ?></td>
@@ -303,7 +302,6 @@
 			<input type="submit" value="change password"/>
 		</form>
 	</div>
-	<div class="blackbar"></div>
 </div>
 <?php
 	}

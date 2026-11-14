@@ -116,7 +116,6 @@
 		}
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">
 	
 	    <?php
@@ -169,7 +168,6 @@
 			</div>
 		</div>
 	</div>
-	<div class="blackbar"></div>
 </div>
 <?php
 }

@@ -78,11 +78,11 @@
 				$accountMessage = "$name has not picked up the keys yet.";
 			break;
 
-      case "memoriam":
+			case "memoriam":
 
-        $accountMessage = "$name will always be missed.";
+				$accountMessage = "$name will always be missed.";
 
-      break;
+			break;
 			case "admin":
 			default:
 				if(strtotime($them->timestamp()) < time() - 60 * 60 * 24 * 365) {
@@ -99,7 +99,6 @@
 ?>
 		
 				<div class="contentbox">
-					<div class="blackbar"></div>
 					<div class="heading">
 						<?php echo $accountMessage ?><br/>
 						<span style="color:var(--link-user)">
@@ -209,7 +208,6 @@
 							contributions($usrid);
 						?>
 					</div>
-					<div class="blackbar"></div>
 				</div>
 <?php
 }

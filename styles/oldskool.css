@@ -155,17 +155,18 @@ form.fieldform > [type="submit"] {
             color: var(--color-brand-medium);
         }
     }
+
+    &::before, &::after {
+        content: '';
+        height: 11px;
+        background: black;
+        border-top: 1px solid #666699;
+        border-left: 1px solid #333333;
+    }
 }
 
 #leftcol .contentbox.empty {
     display: none;
-}
-
-.blackbar {
-    background: black;
-    height: 11px;
-    border-top: 1px solid #666699;
-    border-left: 1px solid #333333;
 }
 
 .bluebox {
