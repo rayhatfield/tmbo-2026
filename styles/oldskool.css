@@ -2,20 +2,20 @@
 @import "grid.css";
 
 body {
-    background: var(--color-brand);
-    font-family: verdana, helvetica, sans-serif;
+	background: var(--color-brand);
+	font-family: verdana, helvetica, sans-serif;
 }
 
 a:link {
-    color: var(--color-link);
+	color: var(--color-link);
 }
 
 a:visited {
-    color: var(--color-brand);
+	color: var(--color-brand);
 }
 
 .orange.orange {
-    color: var(--link-accent);
+	color: var(--link-accent);
 }
 
 .bluebox,.entry {
@@ -49,7 +49,7 @@ a:visited {
 }
 
 .vote {
-    white-space: nowrap;
+	white-space: nowrap;
 }
 
 .timestamp, .votecount {
@@ -102,169 +102,169 @@ form.fieldform > [type="submit"] {
 }
 
 #content {
-    display: grid;
-    /* minmax(0, …) so a long unbroken word can't stretch the column past max-width */
-    grid-template-columns: 175px minmax(0, 1fr);
-    /* gap: 12px; */
-    gap: var(--spacing-lg);
-    max-width: 775px;
-    margin: 0 auto;
+	display: grid;
+	/* minmax(0, …) so a long unbroken word can't stretch the column past max-width */
+	grid-template-columns: 175px minmax(0, 1fr);
+	/* gap: 12px; */
+	gap: var(--spacing-lg);
+	max-width: 775px;
+	margin: 0 auto;
 
-    @media (width < 800px) {
-        grid-template-columns: minmax(0, 1fr);
+	@media (width < 800px) {
+		grid-template-columns: minmax(0, 1fr);
 
-        #leftcol {
-            display: none;
-        }
+		#leftcol {
+			display: none;
+		}
 
-        #rightcol {
-            width: 100%;
-            overflow: auto;
-        }
-    }
+		#rightcol {
+			width: 100%;
+			overflow: auto;
+		}
+	}
 }
 
 #titleimg {
-    grid-column: 1 / -1;
-    text-align: right;
-    margin-bottom: calc(var(--spacing-lg) * -1);
+	grid-column: 1 / -1;
+	text-align: right;
+	margin-bottom: calc(var(--spacing-lg) * -1);
 
-    @media (width < 800px) {
-        display: none;
-    }
+	@media (width < 800px) {
+		display: none;
+	}
 }
 
 #leftcol, #rightcol {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-lg);
 }
 
 .contentbox {
-    display: flex;
-    flex-direction: column;
-    background: var(--color-brand-dark);
-    border: 2px solid black;
+	display: flex;
+	flex-direction: column;
+	background: var(--color-brand-dark);
+	border: 2px solid black;
 
-    .heading {
-        color: var(--color-brand-light);
-        font-weight: bold;
-        padding: 0.5rem;
+	.heading {
+		color: var(--color-brand-light);
+		font-weight: bold;
+		padding: 0.5rem;
 
-        .blame, .blame a {
-            color: var(--color-brand-medium);
-        }
-    }
+		.blame, .blame a {
+			color: var(--color-brand-medium);
+		}
+	}
 
-    :where(:not(.menu)) > & {
-        &::before, &::after {
-            content: '';
-            height: 11px;
-            background: black;
-            border-top: 1px solid #666699;
-            border-left: 1px solid #333333;
-        }
-    }
+	:where(:not(.menu)) > & {
+		&::before, &::after {
+			content: '';
+			height: 11px;
+			background: black;
+			border-top: 1px solid #666699;
+			border-left: 1px solid #333333;
+		}
+	}
 
 }
 
 #leftcol .contentbox.empty {
-    display: none;
+	display: none;
 }
 
 .bluebox {
-    background: var(--color-brand-light);
-    padding: var(--spacing);
+	background: var(--color-brand-light);
+	padding: var(--spacing);
 
-    .header {
-        color: var(--color-brand-dark, #003);
-        text-align: center;
-    }
+	.header {
+		color: var(--color-brand-dark, #003);
+		text-align: center;
+	}
 }
 
 /* profile page yearbook photo */
 .yearbook-photo {
-    margin: 0 0 var(--spacing);
+	margin: 0 0 var(--spacing);
 
-    img {
-        display: block;
-    }
+	img {
+		display: block;
+	}
 }
 
 .imagelist {
-    display: grid;
-    grid-template-columns: minmax(200px, 1fr) min-content;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+	display: grid;
+	grid-template-columns: minmax(200px, 1fr) min-content;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 
-    li {
-        display: grid;
-        grid-column: 1 / -1;
-        grid-template-columns: subgrid;
-        padding: var(--spacing-xs);
-        /* unbroken filenames otherwise spill into the comments column */
-        > :first-child {
-            overflow-wrap: anywhere;
-        }
+	li {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		padding: var(--spacing-xs);
+		/* unbroken filenames otherwise spill into the comments column */
+		> :first-child {
+			overflow-wrap: anywhere;
+		}
 
-        @media (width < 800px) {
-            /* .commentlabel {
-                display: none;
-            } */
-            /* padding-block: var(--spacing-md); */
-        }
+		@media (width < 800px) {
+			/* .commentlabel {
+				display: none;
+			} */
+			/* padding-block: var(--spacing-md); */
+		}
 
-        &:nth-child(odd) {
-            background: var(--color-brand-light-alt);
-        }
-    }
+		&:nth-child(odd) {
+			background: var(--color-brand-light-alt);
+		}
+	}
 }
 
 /* .unreadlist {
-    display: grid;
-    margin: 0;
-    padding: 0;
+	display: grid;
+	margin: 0;
+	padding: 0;
 
-    li {
-        display: grid;
-        grid-column: 1 / -1;
-        grid-template-columns: subgrid;
-        padding: var(--spacing-xs);
+	li {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		padding: var(--spacing-xs);
 
-        &:nth-child(even) {
-            background: var(--color-brand-light-alt);
-        }
-    }
+		&:nth-child(even) {
+			background: var(--color-brand-light-alt);
+		}
+	}
 } */
 
 #unread {
-    line-height: 1.8;
+	line-height: 1.8;
 
-    a {
-        color: var(--color-brand-medium);
-    }
+	a {
+		color: var(--color-brand-medium);
+	}
 }
 
 .entry:nth-child(odd) {
-    background: var(--color-brand-light-alt);
+	background: var(--color-brand-light-alt);
 }
 
 #commentList {
-    .userLink {
-        color: var(--color-brand-medium, #669);
-    }
+	.userLink {
+		color: var(--color-brand-medium, #669);
+	}
 
-    .entry {
-        .comment_votes {
-            color: var(--color-brand-medium, #669);
-        }
-    }
+	.entry {
+		.comment_votes {
+			color: var(--color-brand-medium, #669);
+		}
+	}
 }
 
 .textlinks, .textlinks a {
 	color: var(--text-muted);
 	font-size:11px;
-    text-align: center;
-    margin-bottom: 48px;
+	text-align: center;
+	margin-bottom: 48px;
 }
