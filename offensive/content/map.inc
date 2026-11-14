@@ -25,7 +25,6 @@
 	{
 		?>
 	<div class="contentbox">
-		<div class="blackbar"></div>
 		<div class="heading">
 			long time no see. do YOU know where YOUR maxxers are?
 		</div><?php
@@ -52,7 +51,6 @@
 		<script>
 			var mapEdit = <?= $edit ? 'true' : 'false' ?>;
 		</script>
-		<div class="blackbar"></div>
 	</div>
 		
 <?php

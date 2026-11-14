@@ -9,7 +9,6 @@ function start() {
 function body() {
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">
 		subscribe:
 	</div>
@@ -40,7 +39,6 @@ function body() {
 			</form>
 		</div>
 	</div>
-	<div class="blackbar"></div>
 </div>
 <?php
 }

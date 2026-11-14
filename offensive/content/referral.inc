@@ -120,7 +120,6 @@ Enjoy.
 	function body() {
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">put your peeps on the list.</div>
 	<?php tabs(); ?>
 	<div class="bluebox">
@@ -159,7 +158,6 @@ Enjoy.
 			?>
 		</div>
 	</div>
-	<div class="blackbar"></div>
 </div>
 <?php
 	}

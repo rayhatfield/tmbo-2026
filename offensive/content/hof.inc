@@ -23,28 +23,27 @@
 		$view = isset( $_REQUEST['t'] ) ? sqlEscape( $_REQUEST['t'] ) : 'hof';	
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
-		<div class="heading">hall of fame: the coolest files of all time (according to you).</div>
-		<?php tabs(); ?>
+	<div class="heading">hall of fame: the coolest files of all time (according to you).</div>
+	<?php tabs(); ?>
 
-		<div class="tabs subtabs">
-			<div class="<?= ($view == 'hof' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>">all time</a></div>
-			<div class="<?= ($view == 'today' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>&t=today">past 24 hours</a></div>
-		</div>
+	<div class="tabs subtabs">
+		<div class="<?= ($view == 'hof' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>">all time</a></div>
+		<div class="<?= ($view == 'today' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>&t=today">past 24 hours</a></div>
+	</div>
 
 
-		<div class="bluebox">
-			<div id="grid-container">
-				<div class="grid" id="hof">
-					<ul>
-						<li class="header">
-							<div class="col col1"></div>
-							<div class="col col2">filename</div>
-							<div class="col col3">uploaded by</div>
-							<div class="col col4">comments</div>
-							<div class="col col5">votes</div>
-							<div class="col col6"><?php if($view=="today") { ?> hours <?php } else { ?> weeks <?php } ?></div>
-						</li>
+	<div class="bluebox">
+		<div id="grid-container">
+			<div class="grid" id="hof">
+				<ul>
+					<li class="header">
+						<div class="col col1"></div>
+						<div class="col col2">filename</div>
+						<div class="col col3">uploaded by</div>
+						<div class="col col4">comments</div>
+						<div class="col col5">votes</div>
+						<div class="col col6"><?php if($view=="today") { ?> hours <?php } else { ?> weeks <?php } ?></div>
+					</li>
 
 <?php
 		$numPerPage = 100;
@@ -124,7 +123,6 @@
 				</div>
 			</div>
 	</div>
-	<div class="blackbar"></div>
 </div>
 <?php
 	}

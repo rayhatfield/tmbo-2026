@@ -84,7 +84,7 @@ $timelimit = 10;
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+		"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
 
 
 <html<?= me() && me()->getPref("hover_link_previews") == 0 ? ' data-hover-previews="off"' : "" ?>>
@@ -214,46 +214,41 @@ $timelimit = 10;
 					unread();
 				?>
 				<div class="contentbox">
-					<div class="blackbar"></div>
-						<div class="heading">community:</div>
-						<div class="bluebox">
-							<p><a href="http://chat.efnet.org:9090/?channels=themaxx&nick=<?= urlencode(me()->username()); ?>" target="_blank">chat</a></p>
-							<p><a href="<?= Link::content("map") ?>">maxxer world map</a></p>
-							<p><a href="<?= Link::content("referral") ?>">invite a friend</a></p>						
-							<p><a href="<?= Link::content("faq") ?>">FAQ, rules, etc.</a></p>
-							<!-- <p><a href="<?= Link::content("stats") ?>">stats</a></p> -->						
-						</div>
-					<div class="blackbar"></div>
+					<div class="heading">community:</div>
+					<div class="bluebox">
+						<p><a href="http://chat.efnet.org:9090/?channels=themaxx&nick=<?= urlencode(me()->username()); ?>" target="_blank">chat</a></p>
+						<p><a href="<?= Link::content("map") ?>">maxxer world map</a></p>
+						<p><a href="<?= Link::content("referral") ?>">invite a friend</a></p>						
+						<p><a href="<?= Link::content("faq") ?>">FAQ, rules, etc.</a></p>
+						<!-- <p><a href="<?= Link::content("stats") ?>">stats</a></p> -->						
+					</div>
 				</div>
 			<?php } // log in --> get info restricted block ?>
 
 			<div class="contentbox">
-				<div class="blackbar"></div>
-					<div class="heading">bandwidth isn't free:</div>
-					<div class="bluebox">
-						<div style="text-align:center">						
-							<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-								<input type="hidden" name="cmd" value="_xclick">
-								<input type="hidden" name="business" value="bandwidth@thismight.be">
-								<input type="hidden" name="item_name" value="[ this might be offensive ] bandwidth">
-								<input type="hidden" name="no_shipping" value="1">
-								<input type="hidden" name="shipping" value="0">								
-								<input type="hidden" name="no_note" value="1">
-								<input type="hidden" name="currency_code" value="USD">
-								<input type="hidden" name="tax" value="0">
-								<input type="image" src="graphics/paypal.gif" border="0" name="submit" alt="Make payments with PayPal - it's fast, free and secure!">
-							</form>
-						</div>
-						<br/>
-						<div style="text-align:center">						
-							<a href="<?= Link::content("ppsub") ?>"><img src="graphics/paypal_subscribe.gif" border="0"/></a>
-						</div>
+				<div class="heading">bandwidth isn't free:</div>
+				<div class="bluebox">
+					<div style="text-align:center">						
+						<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+							<input type="hidden" name="cmd" value="_xclick">
+							<input type="hidden" name="business" value="bandwidth@thismight.be">
+							<input type="hidden" name="item_name" value="[ this might be offensive ] bandwidth">
+							<input type="hidden" name="no_shipping" value="1">
+							<input type="hidden" name="shipping" value="0">								
+							<input type="hidden" name="no_note" value="1">
+							<input type="hidden" name="currency_code" value="USD">
+							<input type="hidden" name="tax" value="0">
+							<input type="image" src="graphics/paypal.gif" border="0" name="submit" alt="Make payments with PayPal - it's fast, free and secure!">
+						</form>
 					</div>
-				<div class="blackbar"></div>
+					<br/>
+					<div style="text-align:center">						
+						<a href="<?= Link::content("ppsub") ?>"><img src="graphics/paypal_subscribe.gif" border="0"/></a>
+					</div>
+				</div>
 			</div>
 			<?php if(login()) { // archive <--> bottom restricted block ?>
 				<div class="contentbox">
-					<div class="blackbar"></div>
 					<div class="heading">archives:</div>
 					<div class="bluebox"><?php 
 						/* zips */
@@ -277,26 +272,21 @@ $timelimit = 10;
 							<a class="orange" href="<?= Link::content("hof") ?>">hall of fame</a>
 						</span>
 					</div>
-					<div class="blackbar"></div>
 				</div>
 
 				<div class="contentbox">
-					<div class="blackbar"></div>
 					<div class="heading">rss:</div>
 					<div class="bluebox" style="text-align:center">
 						<a href="<?= Link::rss("pic") ?>"><img src="graphics/rss_pics.gif" border="0" alt="rss: pics" width="77" height="15" style="margin-bottom:6px"></a><br/>
 						<a href="<?= Link::rss("zip") ?>"><img src="graphics/rss_zips.gif" border="0" alt="rss: zips" width="77" height="15"></a>
 					</div>			
-					<div class="blackbar"></div>
 				</div>
 
 				<div class="contentbox">
-					<div class="blackbar"></div>
 					<div class="heading">contact:</div>
 					<div class="bluebox">
 						<a href="mailto:ray.hatfield@gmail.com?subject=[tmbo]">ray.hatfield@gmail.com</a>
 					</div>
-					<div class="blackbar"></div>
 				</div><?php
 					if($c != "comments" && $c != "online" && me()->status() == "admin") { whosOn(); }
 					else if($c == "comments") {
@@ -404,7 +394,6 @@ $timelimit = 10;
 		?>
 
 		<div id="<?= htmlEscape($id) ?>" class="contentbox <?= ($isEmpty ? 'empty' : '')?>">
-			<div class="blackbar"></div>
 			<div class="heading">unread comments:</div>
 			<div id="<?= htmlEscape($id) ?>-container" class="bluebox">
 
@@ -422,7 +411,6 @@ $timelimit = 10;
 					<div class="clipper"><a id="<?= htmlEscape($id) ?><?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
 				<?php } ?>
 			</div>
-			<div class="blackbar"></div>
 		</div>
 	<?php }
 
@@ -438,7 +426,6 @@ $timelimit = 10;
 
 		// start us off. ?>
 	<div class="contentbox">
-		<div class="blackbar"></div>
 		<div class="heading">who's on:</div>
 		<div class="bluebox">
 			<table style="width:100%"><?php
@@ -460,7 +447,6 @@ $timelimit = 10;
 				} ?>
 			</table>
 		</div>
-		<div class="blackbar"></div>
 	</div>
 	<?php }
 
@@ -483,7 +469,6 @@ $timelimit = 10;
 
 		// start us off. ?>
 	<div class="contentbox">
-		<div class="blackbar"></div>
 		<div class="heading">subscribers:</div>
 		<div class="bluebox">
 			<table style="width:100%">
@@ -493,6 +478,5 @@ $timelimit = 10;
 				<?php } ?>
 			</table>
 		</div>
-		<div class="blackbar"></div>
 	</div>
 	<?php } ?>

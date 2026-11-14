@@ -75,7 +75,6 @@
 
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">we need to talk.</div>
 <?php
 		tabs();
@@ -158,7 +157,6 @@
 				</div>
 			</div>
 		</div>
-		<div class="blackbar"></div>
 	</div>
 <?php
 	}

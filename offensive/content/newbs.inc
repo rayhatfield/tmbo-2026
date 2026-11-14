@@ -12,7 +12,6 @@
 	function body() {
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">fresh meat.</div>
 <?php
 		tabs();
@@ -20,7 +19,6 @@
 		<div class="bluebox">
 			<?php newbs(); ?>
 		</div>
-		<div class="blackbar"></div>
 	</div>
 		
 <?php
