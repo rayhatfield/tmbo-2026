@@ -14,16 +14,15 @@
 
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
-					<div class="heading">
-						<span style="color:var(--link-user)">
-							<?= $them->htmlUsername() ?> has a posse.
-						</span>
-					</div>
-					<?php tabs(); ?>
-					<div class="bluebox">
-						<h3><?= $them->htmlUsername() ?> has a posse.</h3>
-						<ol>
+	<div class="heading">
+		<span style="color:var(--link-user)">
+			<?= $them->htmlUsername() ?> has a posse.
+		</span>
+	</div>
+	<?php tabs(); ?>
+	<div class="bluebox">
+		<h3><?= $them->htmlUsername() ?> has a posse.</h3>
+		<ol>
 <?php
 			
 			$posse = $them->posse();
@@ -34,7 +33,6 @@
 ?>											
 					</ol>
 					</div>
-					<div class="blackbar"></div>
 				</div>
 <?php
 }

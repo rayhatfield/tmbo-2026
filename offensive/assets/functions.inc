@@ -193,14 +193,12 @@ function publishChange($type, $channels, $data) {
 function box($message, $title="hmm:") {
 	?>
 	<div class="contentbox">
-		<div class="blackbar"></div>
 		<div class="heading"><?= $title ?></div>
 		<div class="bluebox">
 			<div style="text-align:center">
 				<?= $message ?>
 			</div>
 		</div>
-		<div class="blackbar"></div>
 	</div>
 	<?php
 }

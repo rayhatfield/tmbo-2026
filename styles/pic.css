@@ -27,13 +27,6 @@ body {
 	color: var(--state-warning);
 }
 
-.blackbar {
-        background: var(--border-dark);
-        height: 11px;
-        border-top: 1px solid var(--border-medium);
-        border-left: 1px solid var(--gray-dark);
-}
-
 #pic_header {
 	white-space: nowrap;
 	overflow: hidden;

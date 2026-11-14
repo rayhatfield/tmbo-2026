@@ -87,10 +87,10 @@
 					var docViewTop = $(window).scrollTop();
 					var docViewBottom = docViewTop + $(window).height();
 					
-                                        var offset = $(latest_comment).offset();
-                                        if (!offset)
-                                                return false;
-                                        var elemTop = offset.top;
+					var offset = $(latest_comment).offset();
+					if (!offset)
+						return false;
+					var elemTop = offset.top;
 					var elemBottom = elemTop + $(latest_comment).height();
 					
 					return ((elemBottom >= docViewTop) && (elemTop <= docViewBottom)
@@ -131,30 +131,30 @@
 					if(commentExists(comment))
 						return;
 					var html = $(comment.html);
-                                        // Find the entry by class: the template's top-level node layout has changed before.
-                                        var entry = html.filter('.entry');
-                                        if (entry.length == 0)
-                                                entry = html.find('.entry');
-                                        entry = entry.first();
+					// Find the entry by class: the template's top-level node layout has changed before.
+					var entry = html.filter('.entry');
+					if (entry.length == 0)
+						entry = html.find('.entry');
+					entry = entry.first();
 					if($.inArray(comment.userid, me.squelched) != -1)
-                                                entry.find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
+						entry.find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
 					if ($('#thumbnail').length > 0)
 						$('#thumbnail').before(html);
 					else
 						$("#commentList").append(html);
-                                        if (entry.length == 0)
-                                                return;
-                                        entry.hide();
+					if (entry.length == 0)
+						return;
+					entry.hide();
 					var currentScroll = $(window).scrollTop();
 					var slideUp = $('textarea').is(':focus');
 					var propTotals = {};
-                                        latest_comment = entry;
-                                        entry.animate({
-    				"height": "show",
-    				"marginTop": "show",
-    				"marginBottom": "show",
-    				"paddingTop": "show",
-    				"paddingBottom": "show"
+					latest_comment = entry;
+					entry.animate({
+				"height": "show",
+				"marginTop": "show",
+				"marginBottom": "show",
+				"paddingTop": "show",
+				"paddingBottom": "show"
 					}, {
 						step: function(now, fx) {
 							if (slideUp) {
@@ -255,20 +255,19 @@
 ?>	
 
 <div class="contentbox">
-	<div class="blackbar"></div>
-		<div class="heading"><?php
-    // changeblog special header
+	<div class="heading"><?php
+	// changeblog special header
 	if($upload->id() == "211604") {
-		?>
-		changeblog
-		<br/><span style="color:var(--link-user)">beat to fit. paint to match.</span><br/>
-		<?php
+	?>
+	changeblog
+	<br/><span style="color:var(--link-user)">beat to fit. paint to match.</span><br/>
+	<?php
 	} else if( $upload->type() == 'topic' ) {
-		$prefix = $uploader->status() == "admin" ? "" : "don't blame me,";
+	$prefix = $uploader->status() == "admin" ? "" : "don't blame me,";
 
-		echo htmlEscape($upload->filename());
+	echo htmlEscape($upload->filename());
 
-		?><br/><span class="blame"><?= $prefix ?> <?= $uploader->htmlUsername() ?> started it.</span><br/>
+	?><br/><span class="blame"><?= $prefix ?> <?= $uploader->htmlUsername() ?> started it.</span><br/>
 <?php
 	} else {
 ?>
@@ -289,11 +288,11 @@
 
 	$lastcomment = 0;
 	if( $comments_exist > 0) { 
-        // changeblog doesn't say anything demeaning about the people who posted.
-        if($upload->id() != "211604") { 
+	// changeblog doesn't say anything demeaning about the people who posted.
+	if($upload->id() != "211604") { 
 			// one element, so it doesn't throw off the .entry:nth-child striping
 			?><div><b><?= $comments_heading ?></b><label><input type="checkbox" id="link_previews" name="link_previews" aria-label="show link previews" /><span>show</span><span>hide</span> link previews</label></div><?php
-        }
+		}
 
 		$numgood = 0;
 		$numbad = 0;
@@ -339,10 +338,10 @@
 		
 
 			</div>
-                        <?php // outside #commentList so it doesn't throw off the .entry:nth-child striping ?>
-                        <script>
-                                lastcomment = <?php echo $lastcomment ?>;
-                        </script>
+			<?php // outside #commentList so it doesn't throw off the .entry:nth-child striping ?>
+			<script>
+				lastcomment = <?php echo $lastcomment ?>;
+			</script>
 			<div class="heading">
 				<div style="float:right">					
 					<?php if( $upload->subscribed() ) { ?>
@@ -368,23 +367,22 @@
 	</div>
 
 <?php
-    // changeblog shouldn't tease the users with a comment field
-    if($upload->canComment()) {
+	// changeblog shouldn't tease the users with a comment field
+	if($upload->canComment()) {
 ?>
 
 	<div class="contentbox">
-		<div class="blackbar"></div>
-			<div class="heading"><?= $add_comment_heading?></div>
-			<div class="bluebox" style="text-align:center">			
-			<a name="form"></a>
-			<form method="POST" id="comment_form" action="<?php echo $_SERVER['SCRIPT_NAME']?>">
+		<div class="heading"><?= $add_comment_heading?></div>
+		<div class="bluebox" style="text-align:center">			
+		<a name="form"></a>
+		<form method="POST" id="comment_form" action="<?php echo $_SERVER['SCRIPT_NAME']?>">
 
 			
-				<p>
-					<input type="hidden" id="fileid" name="fileid" value="<?= $upload->id() ?>"/>
-					<input type="hidden" name="c" value="comments"/>
-					<textarea name="comment" rows="12" cols="64"></textarea>
-				</p>
+			<p>
+				<input type="hidden" id="fileid" name="fileid" value="<?= $upload->id() ?>"/>
+				<input type="hidden" name="c" value="comments"/>
+				<textarea name="comment" rows="12" cols="64"></textarea>
+			</p>
 				
 
 
@@ -428,11 +426,10 @@
 				
 				</form>
 			</div>
-			<div class="blackbar"></div>
 		</div>
 			
 
 <?php
-    }
+	}
 }
 ?>

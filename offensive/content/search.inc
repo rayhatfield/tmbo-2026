@@ -197,7 +197,6 @@
 	function body() {
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">both hands and a flashlight.</div>
 	<?php tabs(); ?>
 	<div class="bluebox">
@@ -235,7 +234,6 @@
 		
 ?>
 	</div>
-	<div class="blackbar"></div>
 </div>	
 <?php
 	}

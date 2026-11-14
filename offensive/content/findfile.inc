@@ -39,7 +39,6 @@
 		
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">search results</div>
 	<div class="bluebox">
 <?php
@@ -108,7 +107,6 @@
 			</div>
 		</div>
 	</div>
-	<div class="blackbar"></div>
 </div>
 <?php
 
