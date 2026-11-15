@@ -13,6 +13,8 @@
 
 	function start() {
 		global $upload, $uploader;
+		// GET moves the pickup link and clears the subscription
+		refusePrefetch();
 		mustLogIn();
 		
 		if( ! is_intger( $_REQUEST['fileid'] ) ){

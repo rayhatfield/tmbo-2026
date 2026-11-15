@@ -207,6 +207,37 @@ function array_top($arr) {
 	return reset($arr);
 }
 
+/* whether the browser is fetching this page speculatively, before the user
+ * asked for it: <link rel="prefetch">, speculation rules prefetch or prerender,
+ * or a browser's own address-bar prediction. Chromium and current Firefox send
+ * Sec-Purpose: prefetch (with ";prerender" for prerenders). Older Chromium and
+ * Safari send Purpose: prefetch, and older Firefox sends X-Moz: prefetch.
+ */
+function isPrefetch() {
+	foreach(array("HTTP_SEC_PURPOSE", "HTTP_PURPOSE", "HTTP_X_MOZ") as $header) {
+		if(array_key_exists($header, $_SERVER) &&
+		   stripos($_SERVER[$header], "prefetch") !== false) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/* refuse a speculative fetch of a page whose GET has side effects, such as
+ * moving the pickup link. A non-2xx response makes the browser discard the
+ * prefetch or prerender, so a real visit later makes a fresh request. Skipping
+ * only the side effect would be wrong: the browser would show the prefetched
+ * page on a real visit without asking again, and the side effect would never
+ * happen.
+ */
+function refusePrefetch() {
+	if(!isPrefetch()) return;
+	http_response_code(503);
+	header("Cache-Control: no-store");
+	header("Retry-After: 0");
+	exit;
+}
+
 function ssl() {
 	return (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on");
 }

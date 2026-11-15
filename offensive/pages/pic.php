@@ -8,6 +8,9 @@
 	require_once("offensive/assets/core.inc");
 	require_once("offensive/classes/assets.inc");
 
+	// GET moves the pickup link
+	refusePrefetch();
+
 	mustLogIn();
 	time_start($ptime);
 
