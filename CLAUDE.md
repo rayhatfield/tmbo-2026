@@ -6,6 +6,7 @@ Read these before changing anything substantial:
 
 - `README.md`: local setup (Docker, or legacy Vagrant) and common gotchas.
 - `HACKING`: house coding standards, the include path, and page structure.
+- `DESIGN`: how the site should behave and read. Pages work without JavaScript, nothing loads from third parties, controls are text, interaction stays frictionless, and the copy has a voice. Read it before any UI change.
 - `DEPLOYING`: deploy order, migrations, the off switches, and traps that have caused outages. Read it before touching production or the database.
 
 ## Stack
@@ -53,6 +54,8 @@ The full rules are in `HACKING`. The ones that matter most:
 - All queries go through `tmbo_query()`. Escape user input with `sqlEscape()` and database output with `htmlEscape()`.
 - Report errors with `trigger_error()` and an `E_USER_*` level. Admins see them on the page, and everything goes to the server log.
 - `me()` returns the logged-in user.
+- Every feature works with JavaScript disabled. JavaScript only enhances it.
+- Load nothing from third parties at runtime. Vendor assets into the repository.
 - No new jQuery code. Write new or rewritten JavaScript with plain DOM APIs.
 - Custom HTML attributes use `data-*`.
 - Prefer reusing existing CSS (for example `:nth-child` striping) over adding classes.

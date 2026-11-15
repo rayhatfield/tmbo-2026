@@ -1,0 +1,69 @@
+This file is about how tmbo should look, feel and behave. HACKING covers how the code should look. When the two disagree with your plans, they win.
+
+Most of this is common sense. It's written down because common sense keeps losing to "I'll just add a quick framework."
+
+###############################################################################
+ the page works first
+###############################################################################
+tmbo is HTML that a server sends to a browser. Everything else is garnish.
+
+Build every feature so it works with JavaScript turned off: real links, real forms, real submit buttons, a full page load. Then, if it's worth it, add JavaScript to make it nicer: skip the reload, keep the scroll position, open the thing in place. If the script fails to load, throws, or meets a browser it doesn't understand, the user should lose the nicety, not the feature.
+
+If HTML and CSS can do it alone, do it with HTML and CSS. <details> beats a click handler. :target and :checked beat a toggle script. A server-rendered page beats a template assembled in the browser.
+
+Check your change with JavaScript disabled before you call it done. "Nobody turns JavaScript off" is true right up until a script 404s.
+
+###############################################################################
+ light, boring, and everywhere
+###############################################################################
+tmbo should load fast on a bad connection and render in any browser someone is still willing to point at it.
+
+* Nothing from third parties at runtime. No CDN scripts, no web fonts, no icon fonts, no hotlinked anything. If we need an asset, it lives in this repository. Other people's servers go down, change, and track our users, in roughly that order of likelihood. The few that already exist (the map's Google Maps script, a PayPal button image) are debt, not precedent.
+* No frameworks and no build step for the front end. New JavaScript uses plain DOM APIs. jQuery is still on most pages for old code; no new code may use it, and code you rewrite should lose it.
+* Reuse before you add. Use the styles, structural selectors (:nth-child striping and friends) and markup that already exist before inventing a class. The cheapest CSS is the rule you didn't write.
+* Use data-* for custom attributes. Browsers have opinions about made-up attributes.
+* Don't load what the page doesn't use, and don't fetch what the user didn't ask for. (Never prefetch pic pages; see CLAUDE.md for why that one bites.)
+
+###############################################################################
+ get out of the way
+###############################################################################
+Using tmbo should take as little effort as possible. Every click, scroll, dialog, reload and form field is a tax. Pay for it only when it buys something.
+
+* Common actions take one step. Rare actions may take two. Nothing takes five.
+* Don't ask "are you sure?" about things that can be undone. Save confirmation for things that can't.
+* Defaults should be what most people want, so that most people never visit the settings page. Add a setting only when reasonable people genuinely disagree, not to avoid making a decision.
+* Keep people where they were. After an action, return them to the same place on the same page, not to the top of the front page.
+* Work on phones. Thumbs are bigger than cursors and there's no hover. Anything only reachable by hover needs another way in.
+* Keyboard users exist. Controls should be real links and buttons so focus, Enter and screen readers work without extra code.
+
+Frictionless and works-without-JavaScript pull in different directions sometimes. Resolve it in that order: the no-JavaScript path must work, even if it costs a page load. JavaScript is how we then remove the friction.
+
+###############################################################################
+ say it in words
+###############################################################################
+Controls are labelled with text. A word is unambiguous, translatable by the reader's brain, readable by a screen reader, and doesn't need a legend.
+
+Icons are allowed only when both of these hold:
+
+* Space forces it. Usually that means a phone layout or a dense, repeated row such as comment and vote counts, where a word would wrap or push the content around.
+* The text is still there. Every icon carries the same meaning as real text in the markup, visually hidden if need be, or an aria-label on the control, plus a title for people who hover. An icon alone is a riddle.
+
+Icons we ship are vendored into the repository (inline SVG or a CSS mask with a data: URI), never loaded from elsewhere, and they follow the text color so they work in every theme.
+
+Keep labels short and say what will happen. "Vote", "Reply", "Hide this", "Delete forever". Not "Submit", not "OK", not "Click here", not a sentence. If a control needs a paragraph to explain it, the control is the problem.
+
+###############################################################################
+ tmbo has a voice
+###############################################################################
+This is a site called This Might Be Offensive. It should not read like a bank.
+
+Instructions, page titles, empty states, error pages and asides can and should have some snark and humor. Dry beats wacky. A raised eyebrow beats a laugh track.
+
+The joke goes after the information, never instead of it. An error message first says what went wrong and what to do about it, then it may be funny. Someone who just lost a comment wants their comment back, not a bit.
+
+Aim the snark at the situation or at ourselves, not at the user who is trying to do something.
+
+###############################################################################
+ one change at a time
+###############################################################################
+A pull request does one thing. A bug fix doesn't bring along a refactor, a reformat and a new feature it met on the way. Small changes are easy to review, easy to revert and easy to blame, and around here they will be blamed.
