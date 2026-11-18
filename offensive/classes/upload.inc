@@ -194,6 +194,22 @@ class Upload {
 		return ($last_active == null ? $this->timestamp() : $last_active);
 	}
 	
+	/*
+	 * username of the most recent commenter, or null if there are no comments.
+	 * list queries (uploadsql()) prefetch this; otherwise it costs one query.
+	 */
+	public function last_commenter() {
+		if(!array_key_exists("last_commenter", $this->data)) {
+			$sql = "SELECT u.username FROM offensive_comments c, users u
+			        WHERE c.fileid = ".(int)$this->data["id"]." AND u.userid = c.userid
+			        ORDER BY c.id DESC LIMIT 1";
+			$result = tmbo_query($sql);
+			$row = mysqli_fetch_assoc($result);
+			$this->data["last_commenter"] = $row ? $row["username"] : null;
+		}
+		return $this->data["last_commenter"];
+	}
+
 	public function subscribed($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
@@ -623,6 +639,65 @@ class Upload {
 		return $retname;
 	}
 	
+	/*
+	 * yearbook photos get a square, avatar-sized copy for the profile page.
+	 * Made at upload time; older yearbook photos get theirs the first time
+	 * they're asked for.
+	 */
+	const PROFILE_PHOTO_SIZE = 300; // px square; shown at half that for 2x screens
+
+	private function profilePhotoName() {
+		return "thumbs/pp".$this->id().getFileExtension($this->filename());
+	}
+
+	public function profilePhoto() {
+		if($this->type() != "avatar") return '';
+
+		$retname = $this->basePath().$this->profilePhotoName();
+		if(file_exists($retname)) {
+			return $retname;
+		}
+
+		$bigfile = $this->file();
+		if($bigfile == '') {
+			return '';
+		}
+
+		try {
+			$image = new Imagick($bigfile);
+			// first frame only: an animated yearbook photo still animates on its own page
+			$image->setFirstIterator();
+			// the file keeps its EXIF Orientation tag; the copy won't
+			$image->autoOrient();
+			$image->setGravity(imagick::GRAVITY_CENTER);
+			// never upscale a small photo
+			$size = min(self::PROFILE_PHOTO_SIZE, $image->getImageWidth(), $image->getImageHeight());
+			$image->cropThumbnailImage($size, $size);
+			$image->setImagePage(0, 0, 0, 0);
+			ensureDirExists(dirname($retname));
+			$ok = $image->writeImage($retname);
+			$image->destroy();
+		} catch(ImagickException $e) {
+			trigger_error("profile photo for ".$this->id()." failed: ".$e->getMessage(), E_USER_WARNING);
+			return '';
+		}
+
+		if(!$ok) {
+			trigger_error("ImageMagick/writeImage failed", E_USER_WARNING);
+			return '';
+		}
+
+		return $retname;
+	}
+
+	public function profilePhotoURL() {
+		if($this->profilePhoto() == '') {
+			return '';
+		}
+
+		return "/".$this->basePath(null, true).$this->profilePhotoName();
+	}
+
 	public function thumbURL() {
 		// images only
 		// if the file or thumb don't exist, why bother?
@@ -634,18 +709,23 @@ class Upload {
 		       ($this->type() == "audio" ? "" : getFileExtension($this->filename()));
 	}
 	
+	/*
+	 * Comment and vote counts as icons and numbers (see .comments and friends
+	 * in styles/theme.css). The words are in .commentlabel, which is visually
+	 * hidden, and the vote icons carry their own alt text, so screen readers
+	 * still hear "27 comments good 14 bad 3". Realtime updates in main.inc,
+	 * thumbs.inc, audio.inc and discussions.inc rewrite these spans by class.
+	 */
 	public function commentLabel($showvotes=true) {
 		$comments = $this->comments();
 
-		$retval = '<span class="comments">'.$comments."</span>&nbsp;"
-		         .'<span class="commentlabel">comment'.($comments == 1 ? "" :"s")."</span>";
+		$retval = '<span class="comments">'.$comments.'</span>'
+		         .'<span class="commentlabel">comment'.($comments == 1 ? "" : "s").'</span>';
 		if(!$showvotes) return $retval;
 
-		$retval .= '&nbsp;('
-		          .'+<span class="goods">'.$this->goods().'</span>'
-		          .'&nbsp;-<span class="bads">'.$this->bads().'</span>'
-		          .($this->tmbos() > 0 ? '&nbsp;x<span class="tmbos">'.$this->tmbos().'</span>' : "")
-		          .")";
+		$retval .= '<span class="goods">'.$this->goods().'</span>'
+		          .'<span class="bads">'.$this->bads().'</span>'
+		          .($this->tmbos() > 0 ? '<span class="tmbos">'.$this->tmbos().'</span>' : "");
 		return $retval;
 	}
 

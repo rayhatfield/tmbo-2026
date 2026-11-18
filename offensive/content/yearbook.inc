@@ -28,7 +28,6 @@
 	function body() {
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">the beautiful people.</div>
 <?php
 		tabs();
@@ -36,7 +35,6 @@
 		<div class="bluebox">
 			<?php yearbook(); ?>
 		</div>
-		<div class="blackbar"></div>
 	</div>
 <?php
 	}

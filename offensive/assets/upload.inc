@@ -889,7 +889,6 @@ function upload_checkisk(&$postdata) {
 	
 	?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">poster child:</div>
 	<div class="bluebox">
 	<div style="text-align:center">
@@ -928,7 +927,6 @@ function upload_checkisk(&$postdata) {
 	</form>
 	</div>
 	</div>
-	<div class="blackbar"></div>
 </div>
 
 	<?php
@@ -961,7 +959,6 @@ function upload_checkrepost(&$postdata) {
 
 	?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">poster child:</div>
 	<div class="bluebox">
 	<div style="text-align:center">
@@ -1000,7 +997,6 @@ function upload_checkrepost(&$postdata) {
 	</form>
 	</div>
 	</div>
-	<div class="blackbar"></div>
 </div>
 
 	<?php
@@ -1169,6 +1165,10 @@ function upload_insert_file($postdata) {
 	tmbo_query( $sql );
 
 	$upload = new Upload($fileid);
+
+	if($upload->type() == "avatar") {
+		$upload->profilePhoto();
+	}
 
 	publishChange($upload->type(), $upload->channels(), $upload->api_data(true));
 

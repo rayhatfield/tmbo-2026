@@ -102,7 +102,6 @@
 		global $key_options, $key_defaults; ?>
 
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">
 			set things up how you like 'em.
 	</div>
@@ -137,6 +136,23 @@
 					<a href="<?= Link::setPref("hide_bad", 1) ?>">turn bad filter on</a>
 				<?php } ?>
 			</span>
+		</div>
+	</div>
+
+	<div class="heading">link previews:</div>
+	<div class="bluebox">
+		<?php
+			$hoverPreviewText = me()->getPref("hover_link_previews") == 1
+				? "hate link previews on hover? turn that shit off. previews are still available via click on the &#x25A3; before the link."
+				: "want link previews on hover? enable that shit.";
+		?>
+		<p><?= $hoverPreviewText ?></p>
+		<div style="text-align:center"><?php
+			if(me()->getPref("hover_link_previews") == 1) { ?>
+				<a href="<?= Link::setPref("hover_link_previews", 0) ?>">turn hover previews off</a>
+			<?php } else { ?>
+				<a href="<?= Link::setPref("hover_link_previews", 1) ?>">turn hover previews on</a>
+			<?php } ?>
 		</div>
 	</div>
 
@@ -249,7 +265,7 @@
 					<td colspan="2">application: <?= htmlEscape((strlen($token->issued_to()) > 64) ? substr($token->issued_to(), 0, 61)."…" : $token->issued_to()) ?></td>
 				</tr>
 				<tr>
-                    <td colspan="2">token: <?= $token->tokenid() ?><?= $token->readonly() ? " (read only)" : "" ?></td>
+					<td colspan="2">token: <?= $token->tokenid() ?><?= $token->readonly() ? " (read only)" : "" ?></td>
 				</tr>
 				<tr>
 					<td>issued date: <?= $token->issue_date() ?></td>
@@ -286,7 +302,6 @@
 			<input type="submit" value="change password"/>
 		</form>
 	</div>
-	<div class="blackbar"></div>
 </div>
 <?php
 	}

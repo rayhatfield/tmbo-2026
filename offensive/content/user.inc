@@ -78,11 +78,11 @@
 				$accountMessage = "$name has not picked up the keys yet.";
 			break;
 
-      case "memoriam":
+			case "memoriam":
 
-        $accountMessage = "$name will always be missed.";
+				$accountMessage = "$name will always be missed.";
 
-      break;
+			break;
 			case "admin":
 			default:
 				if(strtotime($them->timestamp()) < time() - 60 * 60 * 24 * 365) {
@@ -99,7 +99,6 @@
 ?>
 		
 				<div class="contentbox">
-					<div class="blackbar"></div>
 					<div class="heading">
 						<?php echo $accountMessage ?><br/>
 						<span style="color:var(--link-user)">
@@ -154,8 +153,22 @@
 							if($avatar) {
 // XXX: avatar history
 								if($avatar->file() && !$avatar->squelched()) {
+									$photo = $avatar->filtered() ? '' : $avatar->profilePhotoURL();
+									if($photo != '') {
+								?>
+									<figure class="yearbook-photo">
+										<a href="<?= Link::upload($avatar) ?>"><img src="<?= htmlEscape($photo) ?>"
+											width="<?= Upload::PROFILE_PHOTO_SIZE / 2 ?>" height="<?= Upload::PROFILE_PHOTO_SIZE / 2 ?>"
+											alt="<?= htmlEscape($name) ?>'s yearbook photo"></a>
+										<figcaption><?= $name ?> is gorgeous.</figcaption>
+									</figure>
+								<?php
+									} else {
 								?>
 									<p><a href="<?= Link::upload($avatar) ?>"><?= $name ?> is gorgeous.</a></p>
+								<?php
+									}
+								?>
 									<!-- next onclick="img.src=arr[i]" -->
 								<?php
 								}
@@ -195,7 +208,6 @@
 							contributions($usrid);
 						?>
 					</div>
-					<div class="blackbar"></div>
 				</div>
 <?php
 }

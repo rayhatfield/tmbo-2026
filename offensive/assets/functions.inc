@@ -193,14 +193,12 @@ function publishChange($type, $channels, $data) {
 function box($message, $title="hmm:") {
 	?>
 	<div class="contentbox">
-		<div class="blackbar"></div>
 		<div class="heading"><?= $title ?></div>
 		<div class="bluebox">
 			<div style="text-align:center">
 				<?= $message ?>
 			</div>
 		</div>
-		<div class="blackbar"></div>
 	</div>
 	<?php
 }
@@ -216,5 +214,20 @@ function ssl() {
 function id($id) {
 	return $id;
 }
+
+/*
+ * human-readable duration since $timestamp (anything strtotime understands),
+ * using the largest whole unit: "6 minutes", "1 hour", "2 years".
+ */
+function time_ago($timestamp) {
+	$d = (new DateTime($timestamp))->diff(new DateTime());
+	$parts = array("year" => $d->y, "month" => $d->m, "week" => intdiv($d->d, 7),
+	               "day" => $d->d, "hour" => $d->h, "minute" => $d->i);
+	foreach($parts as $name => $n) {
+		if($n > 0) return $n." ".$name.($n == 1 ? "" : "s");
+	}
+	return "less than a minute";
+}
+
 
 ?>

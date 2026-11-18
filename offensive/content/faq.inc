@@ -9,7 +9,6 @@ function start() {
 function body() {
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">
 		rules and stuff:
 	</div>
@@ -50,7 +49,6 @@ function body() {
 
 	</div>
 
-	<div class="blackbar"></div>
 </div>
 
 <?php

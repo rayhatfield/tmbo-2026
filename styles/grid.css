@@ -13,38 +13,57 @@
     overflow-x: auto;
 
     #discussions {
-        --columns: minmax(200px, 1fr) max-content max-content;
+        /* --columns: minmax(200px, 1fr) max-content max-content; */
+        --columns: min-content 1fr;
+
+        gap: 0 0.5em;
+
+        ul li {
+            align-items: baseline;
+
+            time {
+                grid-column: 2;
+                color: var(--color-brand-medium);
+            }
+
+            > :has(.comments) { /* the comment count */
+                justify-self: end;
+            }
+        }
+
     }
 
+    /* rank, filename and counts like the image list, with the uploader and
+       age on a second line like the discussions list */
     #hof {
-        --columns: repeat(6, max-content);
+        --columns: max-content minmax(0, 1fr) max-content;
+
+        li {
+            align-items: baseline;
+
+            /* the rank. the rows are grid boxes, not list items, so they
+               count themselves (see hof.inc for the start and gaps) */
+            counter-increment: list-item;
+
+            &::before {
+                content: counter(list-item) ".";
+                justify-self: end;
+            }
+
+            > :last-child {
+                grid-column: 2 / -1;
+                color: var(--color-brand-medium);
+
+                time {
+                    white-space: nowrap;
+                }
+            }
+        }
     }
 
     /* on a phone the title column gives way and wraps, so rows fit the screen */
     @media (width < 800px) {
         --columns: minmax(0, 1fr) max-content;
-
-        /* topic title on its own line, comment count and latest comment below it */
-        #discussions {
-            --columns: minmax(0, 1fr) max-content;
-
-            .col1 {
-                grid-column: 1 / -1;
-            }
-        }
-
-        /* filename on its own line next to the rank, the other columns below it */
-        #hof {
-            --columns: max-content minmax(0, 1fr) repeat(3, max-content);
-
-            .col2 {
-                grid-column: 2 / -1;
-            }
-
-            .col3 {
-                grid-column: 2;
-            }
-        }
     }
 
     .grid {
@@ -54,7 +73,7 @@
             font-weight: bold;
         }
     
-        > ul {
+        > :is(ul, ol) {
             display: grid;
             grid-template-columns: var(--columns);
             list-style-type: none;
@@ -68,6 +87,7 @@
                 grid-template-columns: subgrid;
                 padding: var(--spacing-xs);
                 overflow-wrap: break-word;
+                align-items: center;
         
                 /* @media (width < 800px) {
                     .commentlabel {
@@ -94,12 +114,19 @@
         margin: 0;
         padding: 0;
         display: grid;
-        gap: 5px;
+        gap: 10px 5px;
         grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
         justify-items: center;
 
         li {
             overflow: hidden;
         }
+    }
+
+    .thumbcontainer {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        align-items: center;
     }
 }

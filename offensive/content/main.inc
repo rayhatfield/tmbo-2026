@@ -59,7 +59,7 @@
 						if (comment.tmbo) {
 							var tmbo_span = old_row.find('.tmbos');
 							if (tmbo_span.length == 0) {
-								old_row.find('.score a').append(' x<span class="tmbos">0</span>');
+								old_row.find('.score a').append('<span class="tmbos">0</span>');
 								tmbo_span = old_row.find('.tmbos');
 							}
 							var tmbo_count = parseInt(tmbo_span.text()) + 1;
@@ -116,7 +116,6 @@
 
 ?>
 <div class="contentbox">
-<div class="blackbar"></div>
 <div class="heading mainheading">
 
 	<?php
@@ -168,7 +167,6 @@
 		</div>
 	</div>
 </div>
-<div class="blackbar"></div>
 </div>
 <?php
 }

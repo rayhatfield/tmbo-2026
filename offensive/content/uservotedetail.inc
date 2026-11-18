@@ -23,7 +23,6 @@
 		
 		?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">who loves ya, baby?</div>
 	<?php tabs(); ?>
 	<div class="bluebox">
@@ -57,7 +56,6 @@
 		
 	</table>
 	</div>
-	<div class="blackbar"></div>
 </div>
 		<?php
 	}

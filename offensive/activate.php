@@ -36,7 +36,7 @@
 
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+		"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
 <html>
 <head>
 	<title></title>
@@ -47,6 +47,10 @@
 		CSS::add("/styles/theme.dev.css");
 	}
 	CSS::add("/styles/filepilestyle.css");
+	// these were @imported by oldskool.css, which left them without a cache-busting
+	// version string; link them directly so edits reach browsers immediately.
+	CSS::add("/styles/main_nav.css");
+	CSS::add("/styles/grid.css");
 	CSS::add("/styles/oldskool.css");
 	CSS::emit();
 	?>
@@ -87,28 +91,26 @@
 	<div id="leftcol">
 
 		<div class="contentbox">
-			<div class="blackbar"></div>
-				<div class="heading">bandwidth isn't free:</div>
-				<div class="bluebox">
-					<p>help keep this thing running. please make a small donation to help pay for bandwidth.<p>
-					<div style="text-align:center">
+			<div class="heading">bandwidth isn't free:</div>
+			<div class="bluebox">
+				<p>help keep this thing running. please make a small donation to help pay for bandwidth.<p>
+				<div style="text-align:center">
 										
-						<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-							<input type="hidden" name="cmd" value="_xclick">
+					<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+						<input type="hidden" name="cmd" value="_xclick">
 		
-							<input type="hidden" name="business" value="bandwidth@themaxx.com">
-							<input type="hidden" name="item_name" value="[ this might be offensive ] bandwidth">
-							<input type="hidden" name="no_shipping" value="1">
-							<input type="hidden" name="no_note" value="1">
-							<input type="hidden" name="currency_code" value="USD">
-							<input type="hidden" name="tax" value="0">
-							<input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-but04.gif" border="0" name="submit" alt="Make payments with PayPal - it's fast, free and secure!">
-						</form>
+						<input type="hidden" name="business" value="bandwidth@themaxx.com">
+						<input type="hidden" name="item_name" value="[ this might be offensive ] bandwidth">
+						<input type="hidden" name="no_shipping" value="1">
+						<input type="hidden" name="no_note" value="1">
+						<input type="hidden" name="currency_code" value="USD">
+						<input type="hidden" name="tax" value="0">
+						<input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-but04.gif" border="0" name="submit" alt="Make payments with PayPal - it's fast, free and secure!">
+					</form>
 						
-					</div>
-		
 				</div>
-			<div class="blackbar"></div>
+		
+			</div>
 		</div>
 	
 	</div>
@@ -116,7 +118,6 @@
 
 
 	<div class="contentbox">
-		<div class="blackbar"></div>
 		<div class="heading">account activation</div>
 		<div class="bluebox" style="text-align:left">	
 			<div class="entry">

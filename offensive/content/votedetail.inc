@@ -27,7 +27,6 @@
 		
 		?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading">where'd all those votes go? <!-- who do you love? --></div>
 	<?php tabs(); ?>
 	<div class="bluebox">
@@ -61,7 +60,6 @@
 		
 	</table>
 	</div>
-	<div class="blackbar"></div>
 </div>
 
 		<?php

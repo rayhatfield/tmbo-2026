@@ -21,7 +21,6 @@
 
 ?>
 <div class="contentbox">
-	<div class="blackbar"></div>
 	<div class="heading"><?= $nonline ?> folks online in the last <?= $timelimit ?> minutes.</div>
 	<?php tabs(); ?>
 	<div class="bluebox">
@@ -57,7 +56,6 @@
 	</table>
 
 	</div>
-	<div class="blackbar"></div>
 </div>
 <?php 		
 	}

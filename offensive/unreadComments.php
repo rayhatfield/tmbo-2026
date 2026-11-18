@@ -28,9 +28,8 @@
 	
 	?>
 			<div class="contentbox">
-				<div class="blackbar"></div>
-					<div class="heading">unread comments:</div>
-					<div class="bluebox">
+				<div class="heading">unread comments:</div>
+				<div class="bluebox">
 	<?php
 	
 		while( $row = mysqli_fetch_assoc( $result ) ) {
@@ -43,5 +42,4 @@
 	?>
 
 					</div>
-				<div class="blackbar"></div>
 			</div>
