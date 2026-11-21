@@ -824,6 +824,15 @@ function upload_checksize(&$postdata) {
 		return false;
 	}
 
+	// animated images can't be resampled (that would keep one frame), so
+	// don't offer it. ping reads the frame list without decoding pixels.
+	$image = new Imagick();
+	$image->pingImage("$tmpdir/{$postdata['tmpname']}");
+	$animated = image_is_animated($image);
+	$image->destroy();
+	if($animated)
+		return false;
+
 	global $filesize, $expectedFileSize;
 	if(!needCompression($tmpdir."/".$postdata['tmpname'])) 
 		return false;
@@ -837,7 +846,6 @@ function upload_checksize(&$postdata) {
 			<input type=\"submit\" name=\"resample\" value=\"Compress my file.\"/>
 			<input type=\"submit\" name=\"noresample\" value=\"Post it anyway.\"/>
 		</form>";
-	if(array_key_exists('format_name', $postdata) && $postdata['format_name'] == 'gif') $message .= "<br /><br />(If this image is animated, don't click the \"Compress\" button!)";
 
 	box($message, "whoa, nelly.");
 	$_SESSION['postdata'] = serialize($postdata);
