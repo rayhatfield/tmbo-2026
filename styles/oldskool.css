@@ -21,22 +21,12 @@ a:visited {
 	color: var(--color-link-visited);
 }
 
-/* in lists, an unvisited title gets a thick orange underline and a visited one
-   an underline the color of the row, which hides it. browsers apply only colors
-   from :visited and style every link as :link otherwise, so the thickness is
-   set for both and only the underline color differs. the comment count links
-   are left alone. */
-:is(.imagelist, .grid) a:not(:has(.comments)) {
-	text-decoration-thickness: 2px;
-	text-underline-offset: 2px;
-
-	&:link {
-		text-decoration-color: var(--link-accent);
-	}
-
-	&:visited {
-		text-decoration-color: color-mix(in oklch, var(--bg-content), var(--bg-content-alt));
-	}
+/* in lists, a visited title's underline takes the color of the row, which
+   hides it, so only unvisited titles are underlined. browsers apply only colors
+   from :visited, so removing the underline outright isn't possible. the comment
+   count links are left alone. */
+:is(.imagelist, .grid) a:not(:has(.comments)):visited {
+	text-decoration-color: color-mix(in oklch, var(--bg-content), var(--bg-content-alt));
 }
 
 .orange.orange {
