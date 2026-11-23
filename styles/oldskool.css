@@ -134,7 +134,9 @@ form.fieldform > [type="submit"] {
 
 		#rightcol {
 			width: 100%;
-			overflow: auto;
+			/* clip, not auto: a scroll container here would trap the sticky
+				comment author line (theme.css .comment_meta) inside it */
+			overflow-x: clip;
 		}
 	}
 }
@@ -317,6 +319,15 @@ form.fieldform > [type="submit"] {
 #commentList {
 	.userLink {
 		color: var(--color-brand-medium, #669);
+	}
+
+	/* above the phone tab bar (main_nav.css .menuButton: padding, one line,
+		border). a few px short of it: the line's padding covers the rest, so
+		nothing shows through between the two whatever the font. */
+	.comment_meta {
+		@media (width < 800px) {
+			bottom: calc(2 * var(--spacing-lg) + 1rem);
+		}
 	}
 
 	.entry {
